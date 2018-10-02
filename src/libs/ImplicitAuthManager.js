@@ -252,21 +252,34 @@ export class ImplicitAuthManager {
     }
     // validate hooks
     if (config.hooks) {
-      if (!TypeCheck.isObject(config.hooks)) {
-        throw new Error('hooks in config must be typeof [object]');
+      this.areHooksValid(config.hooks);
+    }
+  }
+  // eslint-disable-next-line
+  areHooksValid(hooks) {
+    if (!TypeCheck.isObject(hooks)) {
+      throw new Error('hooks in config must be typeof [object]');
+    }
+    const validHooks = ImplicitAuthManager.validHooks();
+    // loop over object and validate keys and their type
+    Object.keys(hooks).forEach(hook => {
+      if (!validHooks.includes(hook)) {
+        throw new Error(
+          `${hook} in config.hooks is not a valid hook, please see API Docs for information on valid hooks`
+        );
       }
-      const validHooks = ImplicitAuthManager.validHooks();
-      // loop over object and validate keys and their type
-      Object.keys(config.hooks).forEach(hook => {
-        if (!validHooks.includes(hook)) {
-          throw new Error(
-            `${hook} in config.hooks is not a valid hook, please see API Docs for information on valid hooks`
-          );
-        }
-        if (!TypeCheck.isFunction(config.hooks[hook])) {
-          throw new Error(`config.hooks.${hook} must be typeof [function]`);
-        }
-      });
+      if (!TypeCheck.isFunction(hooks[hook])) {
+        throw new Error(`config.hooks.${hook} must be typeof [function]`);
+      }
+    });
+  }
+
+  registerHooks(hooks) {
+    try {
+      this.areHooksValid(hooks);
+      this.config.hooks = { ...this.config.hooks, ...hooks };
+    } catch (e) {
+      console.error('hooks are invalid and weren\'t registered');
     }
   }
   // eslint-disable-next-line
