@@ -1,0 +1,8 @@
+{
+    "presets": ["env", "minify"],
+    "plugins": [
+        "add-module-exports",
+        "transform-export-default",
+        "transform-object-rest-spread"
+    ]
+}
