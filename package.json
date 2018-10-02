@@ -25,7 +25,8 @@
   "dependencies": {
     "hash.js": "^1.1.5",
     "jwt-decode": "^2.2.0",
-    "moment": "^2.22.2"
+    "moment": "^2.22.2",
+    "window": "^4.2.5"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -29,6 +29,12 @@ import {
 } from './localStorage';
 
 import TypeCheck from './TypeCheck';
+// stub crypto if doesn't exist
+if (typeof window !== 'undefined' && window.crypto === undefined) {
+  window.crypto = {
+    getRandomValues: () => [],
+  };
+}
 /**
  * A wrapper around some basic crypto methods
  */
@@ -426,38 +432,38 @@ export class ImplicitAuthManager {
       this.setTokenExpiryTimers();
       this.hooks.onAuthenticateSuccess();
       // fire user authenticated hook
-    } else {
+    } else if (!this.isPageLoadFromSSORedirect()) {
       // this definition should and will change as a better method for detecting a redirect
       // is made apparent
-      if (!this.isPageLoadFromSSORedirect()) {
-        this.hooks.onBeforeAuthRedirect();
-        // force redirect to get authenticated
-        window.location.replace(this.getSSOLoginURIForPageLoadRedirect());
-      } else if (this.isPageLoadHashValidForAuthentication()) {
-        this.hooks.onAfterAuthRedirect();
-        // eslint-disable-next-line
-        const hash = window.location.hash;
-        // eslint-disable-next-line
-        const access_token = this.getAccessTokenFromHash(hash);
-        // eslint-disable-next-line
-        const id_token = this.getIdTokenFromHash(hash);
-        const authenticated = this.saveAuthDataInLocal(access_token, id_token);
-        if (authenticated) {
-          // fire authenticated eventt
-          this.hooks.onAuthenticateSuccess();
-          // set expiry timers
-          this.setTokenExpiryTimers();
-        } else {
-          this.hooks.onAuthenticateFail();
-          // fire authentication failed event
-          this.clearAuthLocalStorage();
-        }
+      this.hooks.onBeforeAuthRedirect();
+      // force redirect to get authenticated
+      const ssoLoginURI = this.getSSOLoginURIForPageLoadRedirect();
+      // eslint-disable-next-line
+      window.location.replace(ssoLoginURI);
+    } else if (this.isPageLoadHashValidForAuthentication()) {
+      this.hooks.onAfterAuthRedirect();
+      // eslint-disable-next-line
+      const hash = window.location.hash;
+      // eslint-disable-next-line
+      const access_token = this.getAccessTokenFromHash(hash);
+      // eslint-disable-next-line
+      const id_token = this.getIdTokenFromHash(hash);
+      const authenticated = this.saveAuthDataInLocal(access_token, id_token);
+      if (authenticated) {
+        // fire authenticated eventt
+        this.hooks.onAuthenticateSuccess();
+        // set expiry timers
+        this.setTokenExpiryTimers();
       } else {
-        // ensures we store no artifacts in local storage
+        this.hooks.onAuthenticateFail();
+        // fire authentication failed event
         this.clearAuthLocalStorage();
       }
       // clear nonce
       this.clearNonce();
+    } else {
+      // ensures we store no artifacts in local storage
+      this.clearAuthLocalStorage();
     }
   }
 
@@ -517,9 +523,8 @@ export class ImplicitAuthManager {
     const tokens = this.getAuthDataFromLocal();
     Object.keys(tokens).forEach(token => {
       const now = moment();
-      const then = moment(token.exp * 1000);
+      const then = moment(tokens[token].exp * 1000);
       const expiresIn = then.diff(now, 'millisecond');
-
       setTimeout(() => {
         // eslint-disable-next-line
         console.log('%cToken Expired...clearing session', 'color: orange');
