@@ -24,7 +24,9 @@ Once you installed you can can use it like any other module:
 ```javascript
 import { ImplicitAuthManager } from '@bcgov/common-web-utils';
 ```
+### Further Documentation
 
+[Implicit Auth Manager](./docs/ImplicitAuthManger.md)
 
 ## Project Status / Goals / Roadmap
 

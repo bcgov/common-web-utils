@@ -4,7 +4,7 @@ This is an implementation of the Open Id Connect Implicit Authorization. It foll
 
 ## Installation
 
-```npm install --save @bcgov/nodejs-common-utils```
+```npm install --save @bcgov/common-web-utils```
 
 
 ## Usage
@@ -15,7 +15,7 @@ Regardless of how you choose to use the manager, a configuration object is requi
 
 ```javascript
 // somewhere in a root level script
-import { ImplicitAuthManager } from '@bcgov/nodejs-common-utils';
+import { ImplicitAuthManager } from '@bcgov/common-web-utils';
 
 const implicitAuthManager = new ImplicitAuthManger({...});
 // main routine that handles token storage and auth redirects
