@@ -520,6 +520,31 @@ describe('Implicit Auth Manager Class', () => {
       const iam = new ImplicitAuthManager(config);
       expect(iam.isPageLoadFromSSORedirect()).toBe(true);
     });
+
+    test('registerHooks doesn\'t register if hooks are invalid', () => {
+      const config = {
+        clientId: 'aweb-app',
+        baseURL: 'https://sso-dev.pathfinder.gov.bc.ca',
+        realmName: 'someRealm',
+        redirectURI: 'mysite.com',
+      };
+      const iam = new ImplicitAuthManager(config);
+      iam.registerHooks({onInvalid: () => undefined});
+      expect(iam.hooks.onInvalid).toBe(undefined);
+    });
+
+    test('registerHooks properly sets hooks', () => {
+      const config = {
+        clientId: 'aweb-app',
+        baseURL: 'https://sso-dev.pathfinder.gov.bc.ca',
+        realmName: 'someRealm',
+        redirectURI: 'mysite.com',
+      };
+      const iam = new ImplicitAuthManager(config);
+      const hook = jest.fn();
+      iam.registerHooks({onTokenExpired: hook});
+      expect(iam.hooks.onTokenExpired).toBe(hook);
+    });
   });
 
   describe('User auth methods', () => {

@@ -206,6 +206,9 @@ these are mostly providers of constants that are attached to this class. They ar
   instance.setTokenExpiryTimers() { undefined }
   // sets the expiry timers via setTimeout
   // the onTokenExpired event is fired within the setTimeout callback
+
+  instance.registerHooks(hooks {Object})
+  // set hooks (new hooks merged in with any existing hooks)
 ```
 
 #### handleOnPageLoad Routine
