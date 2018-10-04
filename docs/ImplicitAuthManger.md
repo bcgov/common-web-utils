@@ -132,8 +132,20 @@ these are mostly providers of constants that are attached to this class. They ar
     iam.redirectURI { String }
     iam.ssoLogoutURI { String }
     iam.ssoLoginURI { String }
-    iam.access_token { Object }
+    iam.access_token { Object } 
+    /*
+      {
+        bearer: { String },
+        data: { Object } your decoded jwt
+      }
+    */
     iam.id_token { Object }
+    /*
+      {
+        bearer: { String },
+        data: { Object } your decoded jwt
+      }
+    */
   ```
 
 ### instance methods
