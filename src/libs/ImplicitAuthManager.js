@@ -279,7 +279,7 @@ export class ImplicitAuthManager {
       this.areHooksValid(hooks);
       this.config.hooks = { ...this.config.hooks, ...hooks };
     } catch (e) {
-      console.error('hooks are invalid and weren\'t registered');
+      console.error("hooks are invalid and weren't registered");
     }
   }
   // eslint-disable-next-line
@@ -323,7 +323,7 @@ export class ImplicitAuthManager {
       return true;
     }
 
-    return Object.keys(tokens).filter(item => this.isTokenExpired(tokens[item])).length > 0;
+    return Object.keys(tokens).filter(item => this.isTokenExpired(tokens[item].data)).length > 0;
   }
 
   // based on the hash value returned from an implicit auth redirect
@@ -372,7 +372,10 @@ export class ImplicitAuthManager {
       const auth = {};
       // eslint-disable-next-line
       if (access_token) {
-        auth.access_token = jwtDecode(access_token);
+        auth.access_token = {
+          data: jwtDecode(access_token),
+          bearer: access_token,
+        };
         // ensure access token nonce matches
         if (this.isAReplayAttack(auth.access_token.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
@@ -380,7 +383,10 @@ export class ImplicitAuthManager {
       }
       // eslint-disable-next-line
       if (id_token) {
-        auth.id_token = jwtDecode(id_token);
+        auth.id_token = {
+          data: jwtDecode(id_token),
+          bearer: id_token,
+        };
         if (this.isAReplayAttack(auth.id_token.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
@@ -522,13 +528,10 @@ export class ImplicitAuthManager {
       return false;
     }
     // if either token is expired user is not authenticated
-    if (
-      (auth.id_token && this.isTokenExpired(auth.id_token)) ||
-      (auth.access_token && this.isTokenExpired(auth.access_token))
-    ) {
-      return false;
-    }
-    return true;
+    return !(
+      (auth.id_token && this.isTokenExpired(auth.id_token.data)) ||
+      (auth.access_token && this.isTokenExpired(auth.access_token.data))
+    );
   }
 
   setTokenExpiryTimers() {
@@ -536,7 +539,7 @@ export class ImplicitAuthManager {
     const tokens = this.getAuthDataFromLocal();
     Object.keys(tokens).forEach(token => {
       const now = moment();
-      const then = moment(tokens[token].exp * 1000);
+      const then = moment(tokens[token].data.exp * 1000);
       const expiresIn = then.diff(now, 'millisecond');
       setTimeout(() => {
         // eslint-disable-next-line
