@@ -148,10 +148,27 @@ export class ImplicitAuthManager {
   }
   // eslint-disable-next-line
   get access_token() {
+    // eslint-disable-next-line
+    console.warning(
+      'instance.access_token is deprecated and will be removed in later versions. Please use instance.accessToken instead'
+    );
     return this.getAccessTokenFromLocal();
   }
   // eslint-disable-next-line
   get id_token() {
+    // eslint-disable-next-line
+    console.warning(
+      'instance.id_token is deprecated and will be removed in later versions. Please use instance.idToken instead'
+    );
+    return this.getIdTokenFromLocal();
+  }
+
+  // eslint-disable-next-line
+  get accessToken() {
+    return this.getAccessTokenFromLocal();
+  }
+  // eslint-disable-next-line
+  get idToken() {
     return this.getIdTokenFromLocal();
   }
 
