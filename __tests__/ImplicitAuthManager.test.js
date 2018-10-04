@@ -343,7 +343,7 @@ describe('Implicit Auth Manager Class', () => {
       const token = {
         exp: oldDate / 1000,
       };
-      saveDataInLocalStorage('auth', { id_token: token });
+      saveDataInLocalStorage('auth', { id_token: { data: token } });
       const config = {
         clientId: '123',
         baseURL: 'https://something.sso.ca',
@@ -366,9 +366,9 @@ describe('Implicit Auth Manager Class', () => {
         exp: oldDate / 1000,
       };
       saveDataInLocalStorage('auth', {
-        id_token: token,
-        access_token: token2,
-        other_token: token3,
+        id_token: { data: token },
+        access_token: { data: token2 },
+        other_token: { data: token3 },
       });
 
       const config = {
@@ -396,9 +396,9 @@ describe('Implicit Auth Manager Class', () => {
         exp: newDate / 1000,
       };
       saveDataInLocalStorage('auth', {
-        id_token: token,
-        access_token: token2,
-        other_token: token3,
+        id_token: { data: token },
+        access_token: { data: token2 },
+        other_token: { data: token3 },
       });
 
       const config = {
@@ -424,9 +424,9 @@ describe('Implicit Auth Manager Class', () => {
         exp: newDate / 1000,
       };
       saveDataInLocalStorage('auth', {
-        id_token: token,
-        access_token: token2,
-        other_token: token3,
+        id_token: { data: token },
+        access_token: { data: token2 },
+        other_token: { data: token3 },
       });
       const config = {
         clientId: '123',
@@ -521,7 +521,7 @@ describe('Implicit Auth Manager Class', () => {
       expect(iam.isPageLoadFromSSORedirect()).toBe(true);
     });
 
-    test('registerHooks doesn\'t register if hooks are invalid', () => {
+    test("registerHooks doesn't register if hooks are invalid", () => {
       const config = {
         clientId: 'aweb-app',
         baseURL: 'https://sso-dev.pathfinder.gov.bc.ca',
@@ -529,7 +529,7 @@ describe('Implicit Auth Manager Class', () => {
         redirectURI: 'mysite.com',
       };
       const iam = new ImplicitAuthManager(config);
-      iam.registerHooks({onInvalid: () => undefined});
+      iam.registerHooks({ onInvalid: () => undefined });
       expect(iam.hooks.onInvalid).toBe(undefined);
     });
 
@@ -542,7 +542,7 @@ describe('Implicit Auth Manager Class', () => {
       };
       const iam = new ImplicitAuthManager(config);
       const hook = jest.fn();
-      iam.registerHooks({onTokenExpired: hook});
+      iam.registerHooks({ onTokenExpired: hook });
       expect(iam.hooks.onTokenExpired).toBe(hook);
     });
   });
@@ -613,17 +613,18 @@ describe('Implicit Auth Manager Class', () => {
         iat: oldDate2 / 1000,
       };
       const auth = {
-        access_token: expired_access_token,
+        access_token: { 
+          data: expired_access_token 
+        },
       };
       // first only set access token into auth local storage
       saveDataInLocalStorage('auth', auth);
       //confirm its in local storage
       expect(localStorage['auth']).toBe(JSON.stringify(auth));
-
       expect(iam.isAuthenticated()).toBe(false);
       //update local storage with only id token
       const auth2 = {
-        id_token: expired_id_token,
+        id_token: { data: expired_id_token },
       };
       saveDataInLocalStorage('auth', auth2);
       // confirm its in local storage
@@ -654,24 +655,35 @@ describe('Implicit Auth Manager Class', () => {
         exp: newDate2 / 1000,
         iat: newDate2 / 1000,
       };
-      const auth = { access_token };
-      // first only set access token into auth local storage
+      const auth = { access_token: { data: access_token } };
+      // // first only set access token into auth local storage
       saveDataInLocalStorage('auth', auth);
-      //confirm its in local storage
+      // //confirm its in local storage
       expect(localStorage['auth']).toBe(JSON.stringify(auth));
 
       expect(iam.isAuthenticated()).toBe(true);
       //update local storage with only id token
-      const auth2 = { id_token };
+      const auth2 = { 
+        id_token: {
+           data: id_token,
+        } 
+      };
       saveDataInLocalStorage('auth', auth2);
-      // confirm its in local storage
+      // // confirm its in local storage
       expect(localStorage['auth']).toBe(JSON.stringify(auth2));
       expect(iam.isAuthenticated()).toBe(true);
 
-      //update local storage with both tokens
-      const auth3 = { id_token, access_token };
+      // //update local storage with both tokens
+      const auth3 = { 
+        id_token: {
+          data: id_token 
+        }, 
+        access_token: { 
+          data: access_token 
+        } 
+      };
       saveDataInLocalStorage('auth', auth3);
-      // confirm its in local storage
+      // // confirm its in local storage
       expect(localStorage['auth']).toBe(JSON.stringify(auth3));
       expect(iam.isAuthenticated()).toBe(true);
     });
