@@ -394,7 +394,7 @@ export class ImplicitAuthManager {
           bearer: access_token,
         };
         // ensure access token nonce matches
-        if (this.isAReplayAttack(auth.access_token.nonce)) {
+        if (this.isAReplayAttack(auth.access_token.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
@@ -404,13 +404,13 @@ export class ImplicitAuthManager {
           data: jwtDecode(id_token),
           bearer: id_token,
         };
-        if (this.isAReplayAttack(auth.id_token.nonce)) {
+        if (this.isAReplayAttack(auth.id_token.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
       // if auth is empty at this point that means access_token, id_token were
       // null and we should throw to avoid garbage data being saved in local storage
-      if (!auth) {
+      if (Object.keys(auth).length === 0) {
         throw new Error('unable to save invalid tokens');
       }
       saveDataInLocalStorage('auth', auth);
@@ -476,15 +476,15 @@ export class ImplicitAuthManager {
       const ssoLoginURI = this.getSSOLoginURIForPageLoadRedirect();
       // eslint-disable-next-line
       window.location.replace(ssoLoginURI);
-    } else if (this.isPageLoadHashValidForAuthentication()) {
+    } else {
       this.hooks.onAfterAuthRedirect();
       // eslint-disable-next-line
       const hash = window.location.hash;
       // eslint-disable-next-line
-      const access_token = this.getAccessTokenFromHash(hash);
+      const accessToken = this.getAccessTokenFromHash(hash);
       // eslint-disable-next-line
-      const id_token = this.getIdTokenFromHash(hash);
-      const authenticated = this.saveAuthDataInLocal(access_token, id_token);
+      const idToken = this.getIdTokenFromHash(hash);
+      const authenticated = this.saveAuthDataInLocal(accessToken, idToken);
       if (authenticated) {
         // fire authenticated eventt
         this.hooks.onAuthenticateSuccess();
@@ -497,9 +497,6 @@ export class ImplicitAuthManager {
       }
       // clear nonce
       this.clearNonce();
-    } else {
-      // ensures we store no artifacts in local storage
-      this.clearAuthLocalStorage();
     }
   }
 
