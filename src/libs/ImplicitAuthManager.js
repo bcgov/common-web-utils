@@ -147,23 +147,6 @@ export class ImplicitAuthManager {
     return this.getSSOLoginURI();
   }
   // eslint-disable-next-line
-  get access_token() {
-    // eslint-disable-next-line
-    console.warning(
-      'instance.access_token is deprecated and will be removed in later versions. Please use instance.accessToken instead'
-    );
-    return this.getAccessTokenFromLocal();
-  }
-  // eslint-disable-next-line
-  get id_token() {
-    // eslint-disable-next-line
-    console.warning(
-      'instance.id_token is deprecated and will be removed in later versions. Please use instance.idToken instead'
-    );
-    return this.getIdTokenFromLocal();
-  }
-
-  // eslint-disable-next-line
   get accessToken() {
     return this.getAccessTokenFromLocal();
   }
@@ -371,7 +354,7 @@ export class ImplicitAuthManager {
   getAccessTokenFromLocal() {
     const authData = getDataFromLocalStorage('auth');
     if (authData) {
-      return authData.access_token;
+      return authData.accessToken;
     }
   }
 
@@ -379,36 +362,36 @@ export class ImplicitAuthManager {
   getIdTokenFromLocal() {
     const authData = getDataFromLocalStorage('auth');
     if (authData) {
-      return authData.id_token;
+      return authData.idToken;
     }
   }
 
   // eslint-disable-next-line
-  saveAuthDataInLocal(access_token, id_token) {
+  saveAuthDataInLocal(accessToken, idToken) {
     try {
       const auth = {};
       // eslint-disable-next-line
-      if (access_token) {
-        auth.access_token = {
-          data: jwtDecode(access_token),
-          bearer: access_token,
+      if (accessToken) {
+        auth.accessToken = {
+          data: jwtDecode(accessToken),
+          bearer: accessToken,
         };
         // ensure access token nonce matches
-        if (this.isAReplayAttack(auth.access_token.data.nonce)) {
+        if (this.isAReplayAttack(auth.accessToken.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
       // eslint-disable-next-line
-      if (id_token) {
-        auth.id_token = {
-          data: jwtDecode(id_token),
-          bearer: id_token,
+      if (idToken) {
+        auth.idToken = {
+          data: jwtDecode(idToken),
+          bearer: idToken,
         };
-        if (this.isAReplayAttack(auth.id_token.data.nonce)) {
+        if (this.isAReplayAttack(auth.idToken.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
-      // if auth is empty at this point that means access_token, id_token were
+      // if auth is empty at this point that means accessToken, idToken were
       // null and we should throw to avoid garbage data being saved in local storage
       if (Object.keys(auth).length === 0) {
         throw new Error('unable to save invalid tokens');
@@ -511,24 +494,24 @@ export class ImplicitAuthManager {
     // eslint-disable-next-line
     const session_state = this.getSessionStateFromHash(urlHash);
     // eslint-disable-next-line
-    const id_token = this.getIdTokenFromHash(urlHash);
+    const idToken = this.getIdTokenFromHash(urlHash);
     // eslint-disable-next-line
-    const access_token = this.getAccessTokenFromHash(urlHash);
+    const accessToken = this.getAccessTokenFromHash(urlHash);
     // eslint-disable-next-line
-    return !session_state || (!id_token || !access_token);
+    return !session_state || (!idToken || !accessToken);
   }
 
-  // a redirect should have atleast one of a id_token or access_token or have an error
+  // a redirect should have atleast one of a idToken or accessToken or have an error
   isPageLoadFromSSORedirect() {
     // eslint-disable-next-line
     const hash = window.location.hash;
     // eslint-disable-next-line
-    const id_token = this.getAccessTokenFromHash(hash);
+    const idToken = this.getAccessTokenFromHash(hash);
     // eslint-disable-next-line
-    const access_token = this.getIdTokenFromHash(hash);
+    const accessToken = this.getIdTokenFromHash(hash);
     const error = this.getErrorFromHash(hash);
     // eslint-disable-next-line
-    return id_token !== null || access_token !== null || error !== null;
+    return idToken !== null || accessToken !== null || error !== null;
   }
 
   isAuthenticated() {
@@ -538,13 +521,13 @@ export class ImplicitAuthManager {
       return false;
     }
     // do any tokens exist
-    if (!auth.id_token && !auth.access_token) {
+    if (!auth.idToken && !auth.accessToken) {
       return false;
     }
     // if either token is expired user is not authenticated
     return !(
-      (auth.id_token && this.isTokenExpired(auth.id_token.data)) ||
-      (auth.access_token && this.isTokenExpired(auth.access_token.data))
+      (auth.idToken && this.isTokenExpired(auth.idToken.data)) ||
+      (auth.accessToken && this.isTokenExpired(auth.accessToken.data))
     );
   }
 
