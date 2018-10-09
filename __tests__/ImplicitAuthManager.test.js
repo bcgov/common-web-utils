@@ -343,7 +343,7 @@ describe('Implicit Auth Manager Class', () => {
       const token = {
         exp: oldDate / 1000,
       };
-      saveDataInLocalStorage('auth', { id_token: { data: token } });
+      saveDataInLocalStorage('auth', { idToken: { data: token } });
       const config = {
         clientId: '123',
         baseURL: 'https://something.sso.ca',
@@ -366,8 +366,8 @@ describe('Implicit Auth Manager Class', () => {
         exp: oldDate / 1000,
       };
       saveDataInLocalStorage('auth', {
-        id_token: { data: token },
-        access_token: { data: token2 },
+        idToken: { data: token },
+        accessToken: { data: token2 },
         other_token: { data: token3 },
       });
 
@@ -396,8 +396,8 @@ describe('Implicit Auth Manager Class', () => {
         exp: newDate / 1000,
       };
       saveDataInLocalStorage('auth', {
-        id_token: { data: token },
-        access_token: { data: token2 },
+        idToken: { data: token },
+        accessToken: { data: token2 },
         other_token: { data: token3 },
       });
 
@@ -424,8 +424,8 @@ describe('Implicit Auth Manager Class', () => {
         exp: newDate / 1000,
       };
       saveDataInLocalStorage('auth', {
-        id_token: { data: token },
-        access_token: { data: token2 },
+        idToken: { data: token },
+        accessToken: { data: token2 },
         other_token: { data: token3 },
       });
       const config = {
@@ -600,21 +600,21 @@ describe('Implicit Auth Manager Class', () => {
       // subtract time from oldDate
       oldDate.setDate(oldDate.getDate() - 5);
       // test access token
-      const expired_access_token = {
+      const expiredAccessToken = {
         name: 'something',
         exp: oldDate / 1000,
         iat: oldDate / 1000,
       };
       const oldDate2 = new Date();
       oldDate2.setDate(oldDate2.getDate() - 10);
-      const expired_id_token = {
+      const expiredIdToken = {
         name: 'another thingm',
         exp: oldDate2 / 1000,
         iat: oldDate2 / 1000,
       };
       const auth = {
         access_token: { 
-          data: expired_access_token 
+          data: expiredAccessToken 
         },
       };
       // first only set access token into auth local storage
@@ -624,7 +624,7 @@ describe('Implicit Auth Manager Class', () => {
       expect(iam.isAuthenticated()).toBe(false);
       //update local storage with only id token
       const auth2 = {
-        id_token: { data: expired_id_token },
+        idToken: { data: expiredIdToken },
       };
       saveDataInLocalStorage('auth', auth2);
       // confirm its in local storage
@@ -643,19 +643,19 @@ describe('Implicit Auth Manager Class', () => {
       // subtract time from newDate
       newDate.setDate(newDate.getDate() + 5);
       // test access token
-      const access_token = {
+      const accessToken = {
         name: 'something',
         exp: newDate / 1000,
         iat: newDate / 1000,
       };
       const newDate2 = new Date();
       newDate2.setDate(newDate2.getDate() + 10);
-      const id_token = {
+      const idToken = {
         name: 'another thingm',
         exp: newDate2 / 1000,
         iat: newDate2 / 1000,
       };
-      const auth = { access_token: { data: access_token } };
+      const auth = { accessToken: { data: accessToken } };
       // // first only set access token into auth local storage
       saveDataInLocalStorage('auth', auth);
       // //confirm its in local storage
@@ -664,8 +664,8 @@ describe('Implicit Auth Manager Class', () => {
       expect(iam.isAuthenticated()).toBe(true);
       //update local storage with only id token
       const auth2 = { 
-        id_token: {
-           data: id_token,
+        idToken: {
+           data: idToken,
         } 
       };
       saveDataInLocalStorage('auth', auth2);
@@ -675,11 +675,11 @@ describe('Implicit Auth Manager Class', () => {
 
       // //update local storage with both tokens
       const auth3 = { 
-        id_token: {
-          data: id_token 
+        idToken: {
+          data: idToken 
         }, 
-        access_token: { 
-          data: access_token 
+        accessToken: { 
+          data: accessToken 
         } 
       };
       saveDataInLocalStorage('auth', auth3);
