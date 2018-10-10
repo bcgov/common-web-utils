@@ -26,7 +26,7 @@ import { ImplicitAuthManager } from '@bcgov/common-web-utils';
 ```
 ### Further Documentation
 
-[Implicit Auth Manager](./docs/ImplicitAuthManger.md)
+[Implicit Auth Manager](https://github.com/bcgov/common-web-utils/blob/master/docs/ImplicitAuthManger.md)
 
 ## Project Status / Goals / Roadmap
 
