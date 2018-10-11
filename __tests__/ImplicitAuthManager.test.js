@@ -1,4 +1,4 @@
-import { ImplicitAuthManager } from '../src/libs/ImplicitAuthManager';
+import { ImplicitAuthManager, CryptoUtils } from '../src/libs/ImplicitAuthManager';
 import { getDataFromLocalStorage, saveDataInLocalStorage } from '../src/libs/localStorage';
 // window.crypto stub
 global.crypto = {
@@ -8,6 +8,16 @@ global.crypto = {
 };
 beforeEach(() => {
   jest.resetModules();
+});
+
+describe('CryptoUtils Helper Class', () => {
+  test('genCryptographicRandomValue returns a string', () => {
+    expect(typeof CryptoUtils.genCryptographicRandomValue()).toBe('string');
+  });
+
+  test('hashSHA256 returns a string', () => {
+    expect(typeof CryptoUtils.hashSHA256('hello world')).toBe('string');
+  });
 });
 
 describe('Implicit Auth Manager Class', () => {
