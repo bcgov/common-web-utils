@@ -132,20 +132,24 @@ these are mostly providers of constants that are attached to this class. They ar
     iam.redirectURI { String }
     iam.ssoLogoutURI { String }
     iam.ssoLoginURI { String }
-    iam.access_token { Object } 
+    iam.accessToken { Object } 
     /*
       {
         bearer: { String },
         data: { Object } your decoded jwt
       }
     */
-    iam.id_token { Object }
+    iam.idToken { Object }
     /*
       {
         bearer: { String },
         data: { Object } your decoded jwt
       }
     */
+   iam.idTokenForRequestHeader { String }
+   /* Bearer asdflkj123123098dlk */
+   iam.accessTokenForRequestHeader { String }
+   /* Bearer asdflkj123123098dlk */
   ```
 
 ### instance methods
@@ -188,12 +192,12 @@ these are mostly providers of constants that are attached to this class. They ar
   // as above but looks for 'error' within hash
 
   instance.getAccessTokenFromLocal(); { Object } 
-  // returns jwt token or undefined if not found
+  // returns jwt token + parsed data or undefined if not found
 
   instance.getIdTokenFromLocal(); { Object } 
-  // returns jwt token or undefined if not found
+  // returns jwt token + parsed data or undefined if not found
 
-  instance.saveAuthDataInLocal(access_token { Object || undefined }, id_token { Object || undefined}); { Boolean } 
+  instance.saveAuthDataInLocal(accessToken { Object || undefined }, idToken { Object || undefined}); { Boolean } 
   // automatically checks for replay attacks by comparing nonce within token with request key
   // if tokens are not parsable or if a replay attack had occured then the tokens will not be saved
   // and false is returned
