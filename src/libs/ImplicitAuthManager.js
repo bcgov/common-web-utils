@@ -146,13 +146,29 @@ export class ImplicitAuthManager {
   get ssoLoginURI() {
     return this.getSSOLoginURI();
   }
-  // eslint-disable-next-line
+
   get accessToken() {
     return this.getAccessTokenFromLocal();
   }
-  // eslint-disable-next-line
+
   get idToken() {
     return this.getIdTokenFromLocal();
+  }
+
+  get idTokenForRequestHeader() {
+    const token = this.getIdTokenFromLocal();
+    if (token && token.bearer) {
+      return `Bearer ${token.bearer}`;
+    }
+    return null;
+  }
+
+  get accessTokenForRequestHeader() {
+    const token = this.getAccessTokenFromLocal();
+    if (token && token.bearer) {
+      return `Bearer ${token.bearer}`;
+    }
+    return null;
   }
 
   // returns the valid response types for implicit auth flow response_type query param
