@@ -58,4 +58,16 @@ export default class TypeCheck {
   static isRegExp(object) {
     return TypeCheck.getClass(object) === 'RegExp';
   }
+
+  /**
+   * helper to match an object with a referer
+   * @param {Object} refererObject
+   * @param {Object} object
+   * @returns {Boolean}
+   * TypeCheck.isA(String, "this is a string"); => true
+   * TypeCheck.isA(Array, [1, 3, 5]); => true
+   */
+  static isA(refererObject, object) {
+    return TypeCheck.getClass(object) === TypeCheck.getClass(refererObject);
+  }
 }

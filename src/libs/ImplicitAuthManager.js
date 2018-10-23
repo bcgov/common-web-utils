@@ -103,7 +103,7 @@ export class CryptoUtils {
 export class ImplicitAuthManager {
   constructor(config = {}) {
     // default config
-    const defaultConfig = this.defaultConfig;
+    const defaultConfig = this.defaultConfig; // eslint-disable-line
     // validate config
     this.validateConfig(config);
     // merge defaults with config
@@ -295,6 +295,7 @@ export class ImplicitAuthManager {
       this.areHooksValid(hooks);
       this.config.hooks = { ...this.config.hooks, ...hooks };
     } catch (e) {
+      // eslint-disable-next-line
       console.error("hooks are invalid and weren't registered");
     }
   }
@@ -346,7 +347,7 @@ export class ImplicitAuthManager {
   // return a parameter by its name
   // eslint-disable-next-line
   getParameterByName(urlHash, name) {
-    const match = RegExp('[#&]' + name + '=([^&]*)').exec(urlHash);
+    const match = RegExp(`[#&]${name}=([^&]*)`).exec(urlHash);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
   }
 
@@ -458,7 +459,7 @@ export class ImplicitAuthManager {
     // this.redirectURI via getter
     return TypeCheck.isFunction(this.redirectURI)
       ? this.redirectURI(apiIntention)
-      : this.redirectURI + `?intention=${apiIntention}&sso=true`;
+      : `${this.redirectURI}?intention=${apiIntention}&sso=true`;
   }
 
   handleOnPageLoad() {
