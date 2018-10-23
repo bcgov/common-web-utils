@@ -623,8 +623,8 @@ describe('Implicit Auth Manager Class', () => {
         iat: oldDate2 / 1000,
       };
       const auth = {
-        access_token: { 
-          data: expiredAccessToken 
+        access_token: {
+          data: expiredAccessToken,
         },
       };
       // first only set access token into auth local storage
@@ -673,10 +673,10 @@ describe('Implicit Auth Manager Class', () => {
 
       expect(iam.isAuthenticated()).toBe(true);
       //update local storage with only id token
-      const auth2 = { 
+      const auth2 = {
         idToken: {
-           data: idToken,
-        } 
+          data: idToken,
+        },
       };
       saveDataInLocalStorage('auth', auth2);
       // // confirm its in local storage
@@ -684,13 +684,13 @@ describe('Implicit Auth Manager Class', () => {
       expect(iam.isAuthenticated()).toBe(true);
 
       // //update local storage with both tokens
-      const auth3 = { 
+      const auth3 = {
         idToken: {
-          data: idToken 
-        }, 
-        accessToken: { 
-          data: accessToken 
-        } 
+          data: idToken,
+        },
+        accessToken: {
+          data: accessToken,
+        },
       };
       saveDataInLocalStorage('auth', auth3);
       // // confirm its in local storage

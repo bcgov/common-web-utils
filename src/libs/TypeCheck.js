@@ -67,7 +67,12 @@ export default class TypeCheck {
    * TypeCheck.isA(String, "this is a string"); => true
    * TypeCheck.isA(Array, [1, 3, 5]); => true
    */
-  static isA(refererObject, object) {
-    return TypeCheck.getClass(object) === TypeCheck.getClass(refererObject);
+  static isA(objectConstructor, object) {
+    if (!TypeCheck.isFunction(objectConstructor)) {
+      throw new Error(
+        'objectContructor must be one of the javascript object constructors: String, Function, Boolean etc.'
+      );
+    }
+    return TypeCheck.getClass(object) === TypeCheck.getClass(objectConstructor());
   }
 }
