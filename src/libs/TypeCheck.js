@@ -58,4 +58,21 @@ export default class TypeCheck {
   static isRegExp(object) {
     return TypeCheck.getClass(object) === 'RegExp';
   }
+
+  /**
+   * helper to match an object with a referer
+   * @param {Object} refererObject
+   * @param {Object} object
+   * @returns {Boolean}
+   * TypeCheck.isA(String, "this is a string"); => true
+   * TypeCheck.isA(Array, [1, 3, 5]); => true
+   */
+  static isA(objectConstructor, object) {
+    if (!TypeCheck.isFunction(objectConstructor)) {
+      throw new Error(
+        'objectContructor must be one of the javascript object constructors: String, Function, Boolean etc.'
+      );
+    }
+    return TypeCheck.getClass(object) === TypeCheck.getClass(objectConstructor());
+  }
 }

@@ -74,6 +74,7 @@ export class CryptoUtils {
  * @param {object} config
  * expected shape
  * {
+ *   kcIDPHint: {string} [optional] identity provider hint so that sso boots you straight to the provider
  *   clientId: {string} [required] client id within your realm,
  *   baseURL: {string} [required] your redhat sso domain,
  *   realmName: {string} [required] name of your realm within the domain,
@@ -103,7 +104,7 @@ export class CryptoUtils {
 export class ImplicitAuthManager {
   constructor(config = {}) {
     // default config
-    const defaultConfig = this.defaultConfig;
+    const defaultConfig = this.defaultConfig; // eslint-disable-line
     // validate config
     this.validateConfig(config);
     // merge defaults with config
@@ -146,13 +147,29 @@ export class ImplicitAuthManager {
   get ssoLoginURI() {
     return this.getSSOLoginURI();
   }
-  // eslint-disable-next-line
+
   get accessToken() {
     return this.getAccessTokenFromLocal();
   }
-  // eslint-disable-next-line
+
   get idToken() {
     return this.getIdTokenFromLocal();
+  }
+
+  get idTokenForRequestHeader() {
+    const token = this.getIdTokenFromLocal();
+    if (token && token.bearer) {
+      return `Bearer ${token.bearer}`;
+    }
+    return null;
+  }
+
+  get accessTokenForRequestHeader() {
+    const token = this.getAccessTokenFromLocal();
+    if (token && token.bearer) {
+      return `Bearer ${token.bearer}`;
+    }
+    return null;
   }
 
   // returns the valid response types for implicit auth flow response_type query param
@@ -220,6 +237,11 @@ export class ImplicitAuthManager {
     if (!config.realmName || !TypeCheck.isString(config.realmName)) {
       throw new Error('realm name in config must be present and typeof [string]');
     }
+
+    if (config.kcIDPHint && !TypeCheck.isString(config.kcIDPHint)) {
+      throw new Error('kcIDPHint in config must be typeof [string]');
+    }
+
     if (config.redirectURI) {
       // if its a function, test if the function returns a string
       if (
@@ -279,6 +301,7 @@ export class ImplicitAuthManager {
       this.areHooksValid(hooks);
       this.config.hooks = { ...this.config.hooks, ...hooks };
     } catch (e) {
+      // eslint-disable-next-line
       console.error("hooks are invalid and weren't registered");
     }
   }
@@ -330,7 +353,7 @@ export class ImplicitAuthManager {
   // return a parameter by its name
   // eslint-disable-next-line
   getParameterByName(urlHash, name) {
-    const match = RegExp('[#&]' + name + '=([^&]*)').exec(urlHash);
+    const match = RegExp(`[#&]${name}=([^&]*)`).exec(urlHash);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
   }
 
@@ -420,9 +443,10 @@ export class ImplicitAuthManager {
     const uriConf = this.config;
     const redirectURI = this.getSSORedirectURI(apiIntentions.LOGIN);
     const nonce = this.createNonce();
+    const kcIDPHint = uriConf.kcIDPHint ? `&kc_idp_hint=${uriConf.kcIDPHint}` : '';
     const loginURI = `${this.baseAuthEndpoint}?response_type=${
       uriConf.loginURIResponseType
-    }&prompt=${prompt}&client_id=${uriConf.clientId}&nonce=${nonce}&redirect_uri=${redirectURI}`; // need to finish createBASE URL fn
+    }&prompt=${prompt}&client_id=${uriConf.clientId}&nonce=${nonce}${kcIDPHint}&redirect_uri=${redirectURI}`; // need to finish createBASE URL fn
     return encodeURI(loginURI);
   }
 
@@ -442,7 +466,7 @@ export class ImplicitAuthManager {
     // this.redirectURI via getter
     return TypeCheck.isFunction(this.redirectURI)
       ? this.redirectURI(apiIntention)
-      : this.redirectURI + `?intention=${apiIntention}&sso=true`;
+      : `${this.redirectURI}?intention=${apiIntention}&sso=true`;
   }
 
   handleOnPageLoad() {

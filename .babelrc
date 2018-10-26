@@ -1,5 +1,5 @@
 {
-    "presets": ["env", "minify"],
+    "presets": ["env"],
     "plugins": [
         "add-module-exports",
         "transform-export-default",

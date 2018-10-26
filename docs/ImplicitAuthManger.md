@@ -34,7 +34,9 @@ The above script is the recommended way of using the manager. The `handleOnPageL
   }
 ```
 >Optional Properties
-
+- ```kc_idp_hint``` 
+  see https://www.keycloak.org/docs/3.3/server_admin/topics/identity-broker/suggested.html
+  
 - ```redirectURI``` (defaults to `window.location.origin`)
 
   redirectURI can be passed in as either a `String` or a `Function`. The redirectURI (if left at default or passed in as a string) after processing will receive a `intention` as a query parameter whenever it's being used to generate a URI. This intention will allow you to differentiate and redirects for different reasons. 
@@ -132,20 +134,24 @@ these are mostly providers of constants that are attached to this class. They ar
     iam.redirectURI { String }
     iam.ssoLogoutURI { String }
     iam.ssoLoginURI { String }
-    iam.access_token { Object } 
+    iam.accessToken { Object } 
     /*
       {
         bearer: { String },
         data: { Object } your decoded jwt
       }
     */
-    iam.id_token { Object }
+    iam.idToken { Object }
     /*
       {
         bearer: { String },
         data: { Object } your decoded jwt
       }
     */
+   iam.idTokenForRequestHeader { String }
+   /* Bearer asdflkj123123098dlk */
+   iam.accessTokenForRequestHeader { String }
+   /* Bearer asdflkj123123098dlk */
   ```
 
 ### instance methods
@@ -188,12 +194,12 @@ these are mostly providers of constants that are attached to this class. They ar
   // as above but looks for 'error' within hash
 
   instance.getAccessTokenFromLocal(); { Object } 
-  // returns jwt token or undefined if not found
+  // returns jwt token + parsed data or undefined if not found
 
   instance.getIdTokenFromLocal(); { Object } 
-  // returns jwt token or undefined if not found
+  // returns jwt token + parsed data or undefined if not found
 
-  instance.saveAuthDataInLocal(access_token { Object || undefined }, id_token { Object || undefined}); { Boolean } 
+  instance.saveAuthDataInLocal(accessToken { Object || undefined }, idToken { Object || undefined}); { Boolean } 
   // automatically checks for replay attacks by comparing nonce within token with request key
   // if tokens are not parsable or if a replay attack had occured then the tokens will not be saved
   // and false is returned

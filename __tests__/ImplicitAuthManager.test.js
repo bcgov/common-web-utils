@@ -1,4 +1,4 @@
-import { ImplicitAuthManager } from '../src/libs/ImplicitAuthManager';
+import { ImplicitAuthManager, CryptoUtils } from '../src/libs/ImplicitAuthManager';
 import { getDataFromLocalStorage, saveDataInLocalStorage } from '../src/libs/localStorage';
 // window.crypto stub
 global.crypto = {
@@ -8,6 +8,16 @@ global.crypto = {
 };
 beforeEach(() => {
   jest.resetModules();
+});
+
+describe('CryptoUtils Helper Class', () => {
+  test('genCryptographicRandomValue returns a string', () => {
+    expect(typeof CryptoUtils.genCryptographicRandomValue()).toBe('string');
+  });
+
+  test('hashSHA256 returns a string', () => {
+    expect(typeof CryptoUtils.hashSHA256('hello world')).toBe('string');
+  });
 });
 
 describe('Implicit Auth Manager Class', () => {
@@ -77,13 +87,26 @@ describe('Implicit Auth Manager Class', () => {
         new ImplicitAuthManager(config);
       }).toThrow('loginURIResponseType in config must be typeof [string]');
     });
+    it("throws if kd_idc_hint isn't valid", () => {
+      const config = {
+        clientId: '123',
+        baseURL: 'https://something.sso.ca',
+        realmName: '432',
+        kcIDPHint: 12,
+      };
+      expect(() => {
+        new ImplicitAuthManager(config);
+      }).toThrow(
+        "kcIDPHint in config must be typeof [string]"
+      );
+    });
 
     it("throws if loginURIResponseType isn't valid", () => {
       const config = {
         clientId: '123',
         baseURL: 'https://something.sso.ca',
         realmName: '432',
-        loginURIResponseType: '123',
+        loginURIResponseType: '12',
       };
       expect(() => {
         new ImplicitAuthManager(config);
@@ -613,8 +636,8 @@ describe('Implicit Auth Manager Class', () => {
         iat: oldDate2 / 1000,
       };
       const auth = {
-        access_token: { 
-          data: expiredAccessToken 
+        access_token: {
+          data: expiredAccessToken,
         },
       };
       // first only set access token into auth local storage
@@ -663,10 +686,10 @@ describe('Implicit Auth Manager Class', () => {
 
       expect(iam.isAuthenticated()).toBe(true);
       //update local storage with only id token
-      const auth2 = { 
+      const auth2 = {
         idToken: {
-           data: idToken,
-        } 
+          data: idToken,
+        },
       };
       saveDataInLocalStorage('auth', auth2);
       // // confirm its in local storage
@@ -674,13 +697,13 @@ describe('Implicit Auth Manager Class', () => {
       expect(iam.isAuthenticated()).toBe(true);
 
       // //update local storage with both tokens
-      const auth3 = { 
+      const auth3 = {
         idToken: {
-          data: idToken 
-        }, 
-        accessToken: { 
-          data: accessToken 
-        } 
+          data: idToken,
+        },
+        accessToken: {
+          data: accessToken,
+        },
       };
       saveDataInLocalStorage('auth', auth3);
       // // confirm its in local storage
