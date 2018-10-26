@@ -74,6 +74,7 @@ export class CryptoUtils {
  * @param {object} config
  * expected shape
  * {
+ *   kcIDPHint: {string} [optional] identity provider hint so that sso boots you straight to the provider
  *   clientId: {string} [required] client id within your realm,
  *   baseURL: {string} [required] your redhat sso domain,
  *   realmName: {string} [required] name of your realm within the domain,
@@ -236,6 +237,11 @@ export class ImplicitAuthManager {
     if (!config.realmName || !TypeCheck.isString(config.realmName)) {
       throw new Error('realm name in config must be present and typeof [string]');
     }
+
+    if (config.kcIDPHint && !TypeCheck.isString(config.kcIDPHint)) {
+      throw new Error('kcIDPHint in config must be typeof [string]');
+    }
+
     if (config.redirectURI) {
       // if its a function, test if the function returns a string
       if (
@@ -437,9 +443,10 @@ export class ImplicitAuthManager {
     const uriConf = this.config;
     const redirectURI = this.getSSORedirectURI(apiIntentions.LOGIN);
     const nonce = this.createNonce();
+    const kcIDPHint = uriConf.kcIDPHint ? `&kc_idp_hint=${uriConf.kcIDPHint}` : '';
     const loginURI = `${this.baseAuthEndpoint}?response_type=${
       uriConf.loginURIResponseType
-    }&prompt=${prompt}&client_id=${uriConf.clientId}&nonce=${nonce}&redirect_uri=${redirectURI}`; // need to finish createBASE URL fn
+    }&prompt=${prompt}&client_id=${uriConf.clientId}&nonce=${nonce}${kcIDPHint}&redirect_uri=${redirectURI}`; // need to finish createBASE URL fn
     return encodeURI(loginURI);
   }
 

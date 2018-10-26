@@ -87,13 +87,26 @@ describe('Implicit Auth Manager Class', () => {
         new ImplicitAuthManager(config);
       }).toThrow('loginURIResponseType in config must be typeof [string]');
     });
+    it("throws if kd_idc_hint isn't valid", () => {
+      const config = {
+        clientId: '123',
+        baseURL: 'https://something.sso.ca',
+        realmName: '432',
+        kcIDPHint: 12,
+      };
+      expect(() => {
+        new ImplicitAuthManager(config);
+      }).toThrow(
+        "kcIDPHint in config must be typeof [string]"
+      );
+    });
 
     it("throws if loginURIResponseType isn't valid", () => {
       const config = {
         clientId: '123',
         baseURL: 'https://something.sso.ca',
         realmName: '432',
-        loginURIResponseType: '123',
+        loginURIResponseType: '12',
       };
       expect(() => {
         new ImplicitAuthManager(config);
