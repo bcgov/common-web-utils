@@ -34,7 +34,9 @@ The above script is the recommended way of using the manager. The `handleOnPageL
   }
 ```
 >Optional Properties
-
+- ```kc_idp_hint``` 
+  see https://www.keycloak.org/docs/3.3/server_admin/topics/identity-broker/suggested.html
+  
 - ```redirectURI``` (defaults to `window.location.origin`)
 
   redirectURI can be passed in as either a `String` or a `Function`. The redirectURI (if left at default or passed in as a string) after processing will receive a `intention` as a query parameter whenever it's being used to generate a URI. This intention will allow you to differentiate and redirects for different reasons. 
