@@ -48,13 +48,15 @@ describe('TypeCheck class', () => {
     expect(TypeCheck.isBoolean(value)).toBe(true);
     expect(TypeCheck.isBoolean(badValue)).toBe(false);
   });
-  test('isA throws if object contructor is invalid', () => {
+
+  it('throws if object contructor is invalid', () => {
     expect(() => {
       TypeCheck.isA(false, '123');
     }).toThrow(
       'objectContructor must be one of the javascript object constructors: String, Function, Boolean etc.'
     );
   });
+  
   it('checks for object against value', () => {
     const obj1 = String;
     const obj2 = Function;
