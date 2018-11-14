@@ -51,6 +51,10 @@ export default class TypeCheck {
     return TypeCheck.getClass(object) === 'String';
   }
 
+  static isAsyncFunction(object) {
+    return object[Symbol.toStringTag] === 'AsyncFunction';
+  }
+
   static isDate(object) {
     return TypeCheck.getClass(object) === 'Date';
   }
