@@ -31,6 +31,7 @@ these are mostly providers of constants that are attached to this class. They ar
   TypeCheck.isNumber(value) { boolean }
   TypeCheck.isDate(value) { boolean }
   TypeCheck.isRegExp(value) { boolean }
+  TypeCheck.isAsyncFunction(value) { boolean }
   TypeCheck.isA(objectType, value) { boolean }
 ```
 
