@@ -1,0 +1,15 @@
+{
+  "sub": "1234567890",
+  "name": "Jane Doe",
+  "iat": 1516239022,
+  "nonce": "1234567890",
+  "aud": "signing-web",
+  "azp": "signing-web",
+  "roles": [
+    "devhub_sign"
+  ],
+  "preferred_username": "foo\\jdoe",
+  "given_name": "Jane",
+  "family_name": "Doe",
+  "email": "jane.doe@example.com"
+}
