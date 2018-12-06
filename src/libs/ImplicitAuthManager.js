@@ -22,13 +22,9 @@
 import hash from 'hash.js';
 import jwtDecode from 'jwt-decode';
 import moment from 'moment';
-import {
-  saveDataInLocalStorage,
-  getDataFromLocalStorage,
-  deleteDataFromLocalStorage,
-} from './localStorage';
-
+import { deleteDataFromLocalStorage, getDataFromLocalStorage, saveDataInLocalStorage } from './localStorage';
 import TypeCheck from './TypeCheck';
+
 // stub crypto if doesn't exist
 if (typeof window !== 'undefined' && window.crypto === undefined) {
   window.crypto = {
@@ -170,6 +166,11 @@ export class ImplicitAuthManager {
       return `Bearer ${token.bearer}`;
     }
     return null;
+  }
+
+  get roles() {
+    const { data } = this.getIdTokenFromLocal();
+    return data && data.roles ? data.roles : [];
   }
 
   // returns the valid response types for implicit auth flow response_type query param
@@ -393,36 +394,43 @@ export class ImplicitAuthManager {
   saveAuthDataInLocal(accessToken, idToken) {
     try {
       const auth = {};
+
       // eslint-disable-next-line
       if (accessToken) {
         auth.accessToken = {
           data: jwtDecode(accessToken),
           bearer: accessToken,
         };
+
         // ensure access token nonce matches
         if (this.isAReplayAttack(auth.accessToken.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
+
       // eslint-disable-next-line
       if (idToken) {
         auth.idToken = {
           data: jwtDecode(idToken),
           bearer: idToken,
         };
+
         if (this.isAReplayAttack(auth.idToken.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
+
       // if auth is empty at this point that means accessToken, idToken were
       // null and we should throw to avoid garbage data being saved in local storage
       if (Object.keys(auth).length === 0) {
         throw new Error('unable to save invalid tokens');
       }
+
       saveDataInLocalStorage('auth', auth);
+
       return true;
     } catch (e) {
-      // need to figuire out what would be appropriate here
+      // need to figure out what would be appropriate here
       return false;
     }
   }
