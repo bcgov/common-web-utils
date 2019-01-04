@@ -21,17 +21,18 @@ if(TypeCheck.isFunction(notAFunction)) {
 ## API
 
 ### static methods
-these are mostly providers of constants that are attached to this class. They are consumed by the instance but may also be helpful outisde.
 ```javascript
-  TypeCheck.isObject(value) { boolean } 
-  TypeCheck.isString(value) { boolean } 
-  TypeCheck.isArray(value) { boolean } 
-  TypeCheck.isFunction(value) { boolean }
-  TypeCheck.isBoolean(value) { boolean }
-  TypeCheck.isNumber(value) { boolean }
-  TypeCheck.isDate(value) { boolean }
-  TypeCheck.isRegExp(value) { boolean }
-  TypeCheck.isAsyncFunction(value) { boolean }
-  TypeCheck.isA(objectType, value) { boolean }
+  TypeCheck.isObject(value) { boolean }  // TypeCheck.isObject({});
+  TypeCheck.isString(value) { boolean } // TypeCheck.isString('hello world');
+  TypeCheck.isArray(value) { boolean }  // TypeCheck.isArray([1, 2, 3]);
+  TypeCheck.isFunction(value) { boolean } // TypeCheck.isFunction(() => null);
+  TypeCheck.isBoolean(value) { boolean } // TypeCheck.isBoolean(true);
+  TypeCheck.isNumber(value) { boolean } // TypeCheck.isNumber(123);
+  TypeCheck.isDate(value) { boolean } // TypeCheck.isDate(new Date());
+  TypeCheck.isRegExp(value) { boolean } // TypeCheck.isRegExp(/foo/);
+  // please not is async function only works with es6 'async function' syntax
+  TypeCheck.isAsyncFunction(value) { boolean } // TypeCheck.isAsyncFunction(async () => null);
+  TypeCheck.isA(objectType, value) { boolean } // TypeCheck.isA(String, 'hello world');
+  TypeCheck.isArrayOf(objectType, value) { boolean } // TypeCheck.isArrayOf(String, ['hello', 'world']);
 ```
 

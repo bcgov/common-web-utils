@@ -1,6 +1,6 @@
 {
   "name": "@bcgov/common-web-utils",
-  "version": "0.3.2",
+  "version": "0.4.2",
   "description": "",
   "engine": "node 8.4.0",
   "main": "dist/index.js",

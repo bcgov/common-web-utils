@@ -63,6 +63,12 @@ export default class TypeCheck {
     return TypeCheck.getClass(object) === 'RegExp';
   }
 
+  static isArrayOf(objectContructor, object) {
+    if (!TypeCheck.isArray(object)) return false;
+
+    return object.every(item => TypeCheck.isA(objectContructor, item));
+  }
+
   /**
    * helper to match an object with a referer
    * @param {Object} refererObject

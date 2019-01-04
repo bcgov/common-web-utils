@@ -68,4 +68,25 @@ describe('TypeCheck class', () => {
     expect(TypeCheck.isA(obj2, value2)).toBe(true);
     expect(TypeCheck.isA(obj2, value1)).toBe(false);
   });
+
+  it('can check for an array of strings', () => {
+    const array = ['1', '2'];
+    expect(TypeCheck.isArrayOf(String, array)).toBe(true);
+  });
+
+  it('returns false if not array', () => {
+    const array = null;
+    expect(TypeCheck.isArrayOf(String, array)).toBe(false);
+  });
+
+
+  it('returns false if array but object is incorrect', () => {
+    const array = [1, 2, 3];
+    expect(TypeCheck.isArrayOf(String, array)).toBe(false);
+  });
+
+  it('returns false if array but one value isn\'t correct', () => {
+    const array = [1, '2', 3];
+    expect(TypeCheck.isArrayOf(Number, array)).toBe(false);
+  });
 });
