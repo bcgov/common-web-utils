@@ -22,7 +22,11 @@
 import hash from 'hash.js';
 import jwtDecode from 'jwt-decode';
 import moment from 'moment';
-import { deleteDataFromLocalStorage, getDataFromLocalStorage, saveDataInLocalStorage } from './localStorage';
+import {
+  deleteDataFromLocalStorage,
+  getDataFromLocalStorage,
+  saveDataInLocalStorage,
+} from './localStorage';
 import TypeCheck from './TypeCheck';
 
 // stub crypto if doesn't exist
@@ -454,7 +458,9 @@ export class ImplicitAuthManager {
     const kcIDPHint = uriConf.kcIDPHint ? `&kc_idp_hint=${uriConf.kcIDPHint}` : '';
     const loginURI = `${this.baseAuthEndpoint}?response_type=${
       uriConf.loginURIResponseType
-    }&prompt=${prompt}&client_id=${uriConf.clientId}&nonce=${nonce}${kcIDPHint}&redirect_uri=${redirectURI}`; // need to finish createBASE URL fn
+    }&prompt=${prompt}&client_id=${
+      uriConf.clientId
+    }&nonce=${nonce}${kcIDPHint}&redirect_uri=${redirectURI}`; // need to finish createBASE URL fn
     return encodeURI(loginURI);
   }
 
