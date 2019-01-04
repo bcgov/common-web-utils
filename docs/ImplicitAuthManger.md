@@ -34,7 +34,7 @@ The above script is the recommended way of using the manager. The `handleOnPageL
   }
 ```
 >Optional Properties
-- ```kc_idp_hint``` 
+- ```kcIDPHint``` 
   see https://www.keycloak.org/docs/3.3/server_admin/topics/identity-broker/suggested.html
   
 - ```redirectURI``` (defaults to `window.location.origin`)
