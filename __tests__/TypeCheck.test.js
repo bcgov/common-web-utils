@@ -60,13 +60,17 @@ describe('TypeCheck class', () => {
   it('checks for object against value', () => {
     const obj1 = String;
     const obj2 = Function;
+    const obj3 = Map;
     const value1 = 'true';
     const value2 = () => null;
+    const value3 = new Map();
 
     expect(TypeCheck.isA(obj1, value1)).toBe(true);
     expect(TypeCheck.isA(obj1, value2)).toBe(false);
     expect(TypeCheck.isA(obj2, value2)).toBe(true);
     expect(TypeCheck.isA(obj2, value1)).toBe(false);
+    expect(TypeCheck.isA(obj3, value1)).toBe(false);
+    expect(TypeCheck.isA(obj3, value3)).toBe(true);
   });
 
   it('can check for an array of strings', () => {
@@ -88,5 +92,10 @@ describe('TypeCheck class', () => {
   it('returns false if array but one value isn\'t correct', () => {
     const array = [1, '2', 3];
     expect(TypeCheck.isArrayOf(Number, array)).toBe(false);
+  });
+
+  it('checks for Map', () => {
+    expect(TypeCheck.isMap(new Map())).toBe(true);
+    expect(TypeCheck.isMap({})).toBe(false);
   });
 });

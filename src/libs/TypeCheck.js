@@ -59,6 +59,10 @@ export default class TypeCheck {
     return TypeCheck.getClass(object) === 'Date';
   }
 
+  static isMap(object) {
+    return TypeCheck.getClass(object) === 'Map';
+  }
+
   static isRegExp(object) {
     return TypeCheck.getClass(object) === 'RegExp';
   }
@@ -71,18 +75,18 @@ export default class TypeCheck {
 
   /**
    * helper to match an object with a referer
-   * @param {Object} refererObject
+   * @param {Object} ObjectConstructor one of the javascript data type constructors
    * @param {Object} object
    * @returns {Boolean}
    * TypeCheck.isA(String, "this is a string"); => true
    * TypeCheck.isA(Array, [1, 3, 5]); => true
    */
-  static isA(objectConstructor, object) {
-    if (!TypeCheck.isFunction(objectConstructor)) {
+  static isA(ObjectContstructor, object) {
+    if (!TypeCheck.isFunction(ObjectContstructor)) {
       throw new Error(
         'objectContructor must be one of the javascript object constructors: String, Function, Boolean etc.'
       );
     }
-    return TypeCheck.getClass(object) === TypeCheck.getClass(objectConstructor());
+    return TypeCheck.getClass(object) === TypeCheck.getClass(new ObjectContstructor());
   }
 }
