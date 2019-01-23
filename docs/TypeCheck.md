@@ -23,6 +23,7 @@ if(TypeCheck.isFunction(notAFunction)) {
 ### static methods
 ```javascript
   TypeCheck.isObject(value) { boolean }  // TypeCheck.isObject({});
+  TypeCheck.isMap(value) { boolean }  // TypeCheck.isObject({});
   TypeCheck.isString(value) { boolean } // TypeCheck.isString('hello world');
   TypeCheck.isArray(value) { boolean }  // TypeCheck.isArray([1, 2, 3]);
   TypeCheck.isFunction(value) { boolean } // TypeCheck.isFunction(() => null);
