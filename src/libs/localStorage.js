@@ -51,6 +51,7 @@ export const getDataFromLocalStorage = key => {
   return undefined;
 };
 
+// eslint-disable-next-line consistent-return
 export const deleteDataFromLocalStorage = key => {
   try {
     localStorage.removeItem(key);
