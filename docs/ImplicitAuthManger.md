@@ -2,10 +2,13 @@
 
 This is an implementation of the Open Id Connect Implicit Authorization. It follow's best practices as defined by the the [Open Id Connect Specs](https://openid.net/developers/specs/)
 
+## Prerequisites
+- some knowledge of SSO (specifically open id) 
+- access to your SSO provider so you can grab SSO details such as the realm and client id.
+
 ## Installation
 
 ```npm install --save @bcgov/common-web-utils```
-
 
 ## Usage
 
@@ -22,8 +25,10 @@ const implicitAuthManager = new ImplicitAuthManger({...});
 export default implicitAuthManager;
 ```
 
+### A React-Redux Implementation
 This example utilizes redux but you can choose to implement Implicit Auth Manager in whatever way
 you see fit.
+
 ```javascript
 // app.js
 
@@ -45,6 +50,15 @@ class App Extends React.Component {
       iam.handleOnPageLoad();
     }
   }
+
+  render() {
+    const { authenticated } = this.props;
+    return (
+      <div>
+        { authenticated ? <p>Logged In</p> : <p>Logged Out</p>}
+      </div>
+    )
+  }
 }
 
 // bind redux action creators to dispatch
@@ -53,12 +67,16 @@ const mapDispatchToProps = dispatch => ({
   logout: () => dispatch(actions.logout()),
 });
 
-export default connect(null, mapDispatchToProps)(App);
+const mapStateToProps = state => ({
+  authenticated: state.authenticated,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
 ```
 
 
 
-The above script is the recommended way of using the manager. The `handleOnPageLoad()` will trigger events like page redirects and token expiry automatically. In a **React** app this code would most likely live somewhere near the root level of your component tree as it should be called shortly after page load. The `hooks` configuration obejct will allow you to tie your React code with the implicitAuthManager in that case.
+The above script is the recommended way of using the manager. The `handleOnPageLoad()` will trigger events like page redirects and token expirations automatically. In a **React** app this code would most likely live somewhere near the root level of your component tree as it should be called shortly after page load. The `hooks` configuration object will allow you to tie your React code with the implicitAuthManager in that case.
 
 ### configuration
 >Mandatory Properties
@@ -72,6 +90,7 @@ The above script is the recommended way of using the manager. The `handleOnPageL
 >Optional Properties
 - ```kcIDPHint``` 
   see https://www.keycloak.org/docs/3.3/server_admin/topics/identity-broker/suggested.html
+  this is a keycloak only supported property, other providers may not support this param
   
 - ```redirectURI``` (defaults to `window.location.origin`)
 
