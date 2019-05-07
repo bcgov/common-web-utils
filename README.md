@@ -6,17 +6,8 @@ Code duplication is a big issue. As developers move from from project to project
 This project is intended to act as a place where front end developers can store and share useful snippets of code.
 
 ## Usage
-
-Install via `npm` as you would with any other package by supplying both the repo URL and branch or tag reference. In the example below the tag *v0.0.1* is used.
-
 ```console
-npm i -S @bcgov/common-web-utils
-```
-
-You can also directly add it to your `package.json` file by inserting the following line into your dependencies section:
-
-```json
-"@bcgov/nodejs-common-utils": "git+https://git@github.com/bcgov/common-web-utils.git#v0.0.1",
+npm i --save @bcgov/common-web-utils
 ```
 
 Once you installed you can can use it like any other module:
@@ -24,6 +15,11 @@ Once you installed you can can use it like any other module:
 ```javascript
 import { ImplicitAuthManager } from '@bcgov/common-web-utils';
 ```
+
+### Available Modules
+- ImplicitAuthManager: this is an SSO Implicit Auth Helper Library
+- TypeCheck: (__deprecated__) this is a simple type checking library
+
 ### Further Documentation
 
 [Implicit Auth Manager](https://github.com/bcgov/common-web-utils/blob/master/docs/ImplicitAuthManger.md)
@@ -31,12 +27,6 @@ import { ImplicitAuthManager } from '@bcgov/common-web-utils';
 ## Project Status / Goals / Roadmap
 
 This project is **active**. 
-
-
-## Getting Help or Reporting an Issue
-
-Send a note to bcdevexchange@gov.bc.ca and you'll get routed to the right person to help you out.
-
 
 ## How to Contribute
 
@@ -47,7 +37,7 @@ Create a pull request with your code. Its really that simple.
 
 ## License
 
-    Copyright 2018 Province of British Columbia
+    Copyright 2019 Province of British Columbia
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -63,4 +53,3 @@ Create a pull request with your code. Its really that simple.
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">nodejs-common-utils</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">the Province of British Columbia</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
 
-[export-xcarchive]: https://github.com/bcdevops/mobile-cicd-api/raw/develop/doc/images/export-xcarchive.gif "Prepare & Export xcarchive"

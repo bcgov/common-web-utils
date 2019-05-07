@@ -24,6 +24,10 @@
  */
 export default class TypeCheck {
   static getClass(object) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'TypeCheck is deprecated in favor of better supported type checking libraries.\n Consider using lodash https://lodash.com as TypeCheck will no longer be supported as of v1.0.0'
+    );
     return Object.prototype.toString.call(object).slice(8, -1);
   }
 

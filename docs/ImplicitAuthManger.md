@@ -2,10 +2,13 @@
 
 This is an implementation of the Open Id Connect Implicit Authorization. It follow's best practices as defined by the the [Open Id Connect Specs](https://openid.net/developers/specs/)
 
+## Prerequisites
+- some knowledge of SSO (specifically open id) 
+- access to your SSO provider so you can grab SSO details such as the realm and client id.
+
 ## Installation
 
 ```npm install --save @bcgov/common-web-utils```
-
 
 ## Usage
 
@@ -14,15 +17,66 @@ The class provides a high and low level API depending on your implementation. Th
 Regardless of how you choose to use the manager, a configuration object is required to setup the object
 
 ```javascript
-// somewhere in a root level script
+// auth.js
 import { ImplicitAuthManager } from '@bcgov/common-web-utils';
 
 const implicitAuthManager = new ImplicitAuthManger({...});
-// main routine that handles token storage and auth redirects
-implicitAuthManager.handleOnPageLoad();
+
+export default implicitAuthManager;
 ```
 
-The above script is the recommended way of using the manager. The `handleOnPageLoad()` will trigger events like page redirects and token expiry automatically. In a **React** app this code would most likely live somewhere near the root level of your component tree as it should be called shortly after page load. The `hooks` configuration obejct will allow you to tie your React code with the implicitAuthManager in that case.
+### A React-Redux Implementation
+This example utilizes redux but you can choose to implement Implicit Auth Manager in whatever way
+you see fit.
+
+```javascript
+// app.js
+
+import iam from './auth';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
+class App Extends React.Component {
+  componentDidMount() {
+    iam.registerHooks({
+      // pass in id token into the success hook callback 
+      onAuthenticateSuccess: () => this.props.login(iam.idToken),
+      onAuthenticateFail: () => this.props.logout(),
+      // onAuthLocalStorageCleared: () => this.props.logout(),
+    });
+    // if running locally, do not call handle on page load since
+    // keycloak redirects to localhost will always fail
+    if (!window.location.host.match(/localhost/)) {
+      iam.handleOnPageLoad();
+    }
+  }
+
+  render() {
+    const { authenticated } = this.props;
+    return (
+      <div>
+        { authenticated ? <p>Logged In</p> : <p>Logged Out</p>}
+      </div>
+    )
+  }
+}
+
+// bind redux action creators to dispatch
+const mapDispatchToProps = dispatch => ({
+  login: idToken => dispatch(actions.login(idToken)),
+  logout: () => dispatch(actions.logout()),
+});
+
+const mapStateToProps = state => ({
+  authenticated: state.authenticated,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+```
+
+
+
+The above script is the recommended way of using the manager. The `handleOnPageLoad()` will trigger events like page redirects and token expirations automatically. In a **React** app this code would most likely live somewhere near the root level of your component tree as it should be called shortly after page load. The `hooks` configuration object will allow you to tie your React code with the implicitAuthManager in that case.
 
 ### configuration
 >Mandatory Properties
@@ -36,6 +90,7 @@ The above script is the recommended way of using the manager. The `handleOnPageL
 >Optional Properties
 - ```kcIDPHint``` 
   see https://www.keycloak.org/docs/3.3/server_admin/topics/identity-broker/suggested.html
+  this is a keycloak only supported property, other providers may not support this param
   
 - ```redirectURI``` (defaults to `window.location.origin`)
 
