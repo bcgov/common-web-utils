@@ -26,6 +26,13 @@
         -   [Parameters][22]
     -   [isPageLoadHashValidForAuthentication][23]
     -   [isPageLoadFromSSORedirect][24]
+-   [saveDataInLocalStorage][25]
+    -   [Parameters][26]
+-   [getDataFromLocalStorage][27]
+    -   [Parameters][28]
+-   [TypeCheck][29]
+    -   [isA][30]
+        -   [Parameters][31]
 
 ## CryptoUtils
 
@@ -37,10 +44,10 @@ hashes the value and checks against a hash to see if they match
 
 #### Parameters
 
--   `value` **[string][25]** 
--   `hashedValue` **[string][25]** 
+-   `value` **[string][32]** 
+-   `hashedValue` **[string][32]** 
 
-Returns **[boolean][26]** true if value matches hash
+Returns **[boolean][33]** true if value matches hash
 
 ## ImplicitAuthManager
 
@@ -48,32 +55,32 @@ Utility Class for Management of OCID Implicit Auth Flow
 
 ### Parameters
 
--   `config` **[Object][27]** the config object, \* = optional properties (optional, default `{}`)
-    -   `config.kcIDPHint` **[String][25]** -   identity provider hint so that sso boots you straight to the provider
-    -   `config.baseURL` **[String][25]** your sso providers base url eg [https://something.sso.com/][28]
-    -   `config.clientId` **[String][25]** client id within your sso realm
-    -   `config.realmName` **[String][25]** name of your sso realm
-    -   `config.redirectURI` **([String][25] \| [Function][29])** -   Defaults to window.location.origin + intention
+-   `config` **[Object][34]** the config object, \* = optional properties (optional, default `{}`)
+    -   `config.kcIDPHint` **[String][32]** -   identity provider hint so that sso boots you straight to the provider
+    -   `config.baseURL` **[String][32]** your sso providers base url eg [https://something.sso.com/][35]
+    -   `config.clientId` **[String][32]** client id within your sso realm
+    -   `config.realmName` **[String][32]** name of your sso realm
+    -   `config.redirectURI` **([String][32] \| [Function][36])** -   Defaults to window.location.origin + intention
             if redirect URI is a string, during login/logout processes the redirectURI will have a query param appended to it
             based on the intention of the process: ie if the call to the authorization server is intended for logging in
             ## the redirect uri will = redirect_uri + ?intention=LOGIN
             you may make the redirect URI a call back function that receives the intention as an argument
             view the validAPIIntentions static function for all the possible intentions that you may want to handle
--   `loginURIResponseType` **[String][25]** -   defaults to id_token, options are ['token', 'id_token', 'id_token token']
--   `hooks` **[Object][27]** -   a set of callback functions that may be utilized to tie in ImplicitAuth Processes to your
+-   `loginURIResponseType` **[String][32]** -   defaults to id_token, options are ['token', 'id_token', 'id_token token']
+-   `hooks` **[Object][34]** -   a set of callback functions that may be utilized to tie in ImplicitAuth Processes to your
         code
-    -   `hooks.onBeforeAuthRedirect` **[Function][29]** called before a redirect occurs
-    -   `hooks.onAfterAuthRedirect` **[Function][29]** : called after a successful redirect back to your client has occured
-    -   `hooks.onAuthLocalStorageCleared` **[Function][29]** 
-    -   `hooks.onTokenExpired` **[Function][29]** 
-    -   `hooks.onAuthenticateSuccess` **[Function][29]** 
-    -   `hooks.onAuthenticateFail` **[Function][29]** 
+    -   `hooks.onBeforeAuthRedirect` **[Function][36]** called before a redirect occurs
+    -   `hooks.onAfterAuthRedirect` **[Function][36]** : called after a successful redirect back to your client has occured
+    -   `hooks.onAuthLocalStorageCleared` **[Function][36]** 
+    -   `hooks.onTokenExpired` **[Function][36]** 
+    -   `hooks.onAuthenticateSuccess` **[Function][36]** 
+    -   `hooks.onAuthenticateFail` **[Function][36]** 
 
 ### redirectURI
 
 returns the redirect uri
 
-Returns **[String][25]** 
+Returns **[String][32]** 
 
 ### ssoLogoutURI
 
@@ -81,7 +88,7 @@ returns the sso logout uri to be implemented by something like an anchor tag
 or a 'navigate' function call
 usage: instance.ssoLogoutURI;
 
-Returns **[String][25]** 
+Returns **[String][32]** 
 
 ### ssoLoginURI
 
@@ -90,37 +97,37 @@ or a 'navigate' function call
 
 -   usage: instance.ssoLoginURI;
 
-Returns **[String][25]** 
+Returns **[String][32]** 
 
 ### accessToken
 
 returns the access token if exists in local storage
 
-Returns **([Object][27] \| [Null][30])** 
+Returns **([Object][34] \| [Null][37])** 
 
 ### idToken
 
 returns the id token if exists in local storage
 
-Returns **([Object][27] \| [Null][30])** 
+Returns **([Object][34] \| [Null][37])** 
 
 ### idTokenForRequestHeader
 
 returns a bearer id token to leverage in an API request header
 
-Returns **[String][25]** 
+Returns **[String][32]** 
 
 ### accessTokenForRequestHeader
 
 returns a bearer access token to leverage in an API request header
 
-Returns **[String][25]** 
+Returns **[String][32]** 
 
 ### roles
 
 returns a list of roles from the id token if exists
 
-Returns **[Array][31]** 
+Returns **[Array][38]** 
 
 ### clearAuthLocalStorage
 
@@ -137,7 +144,7 @@ it is not required that you register to all hooks
 
 #### Parameters
 
--   `hooks` **[Object][27]** the hook callbacks that you are subscribing too
+-   `hooks` **[Object][34]** the hook callbacks that you are subscribing too
 
 Returns **Void** 
 
@@ -145,25 +152,25 @@ Returns **Void**
 
 checks if stored jwt tokens have expired
 
-Returns **[Boolean][26]** true if the token is expired
+Returns **[Boolean][33]** true if the token is expired
 
 ### getAccessTokenFromLocal
 
 gets access token that exists in local storage
 
-Returns **[Object][27]** the access token if exists, otherwise undefined
+Returns **[Object][34]** the access token if exists, otherwise undefined
 
 ### getIdTokenFromLocal
 
 gets id token that exists in local storage
 
-Returns **[Object][27]** the id token if exists, otherwise undefined
+Returns **[Object][34]** the id token if exists, otherwise undefined
 
 ### getSSOLogoutURI
 
 gets the sso logout uri to be used by your front end
 
-Returns **[String][25]** the logout uri
+Returns **[String][32]** the logout uri
 
 ### getSSOLoginURI
 
@@ -171,23 +178,63 @@ returns the sso login uri, this function accepts a prompt to modify the behaviou
 
 #### Parameters
 
--   `prompt` **[String][25]** ['none', 'login', 'consent', 'select_account']
+-   `prompt` **[String][32]** ['none', 'login', 'consent', 'select_account']
     as per open id spec the prompt is OPTIONAL and default to login
-    more info can be found here [https://openid.net/specs/openid-connect-core-1_0.html][32] (search for prompt) (optional, default `'login'`)
+    more info can be found here [https://openid.net/specs/openid-connect-core-1_0.html][39] (search for prompt) (optional, default `'login'`)
 
-Returns **[String][25]** the login uri
+Returns **[String][32]** the login uri
 
 ### isPageLoadHashValidForAuthentication
 
 validates the redirect hash has session state and an id token or access token
 
-Returns **[Boolean][26]** true if valid
+Returns **[Boolean][33]** true if valid
 
 ### isPageLoadFromSSORedirect
 
 detects whether page was loaded because of a redirect from the sso provider
 
-Returns **[Boolean][26]** true if from a sso redirect
+Returns **[Boolean][33]** true if from a sso redirect
+
+## saveDataInLocalStorage
+
+Save data in local storage
+
+### Parameters
+
+-   `key` **[string][32]** 
+-   `data` **[object][34]** 
+
+Returns **any** undefined
+
+## getDataFromLocalStorage
+
+Get data that was saved in local storage
+
+### Parameters
+
+-   `key` **[string][32]** 
+
+Returns **[object][34]** the data object
+
+## TypeCheck
+
+A dependable Type Checking Utility
+Type checking using the native typeof or instanceof can cause issues at times
+as explained by [https://juhukinners.wordpress.com/2009/01/11/typeof-considered-useless-or-how-to-write-robust-type-checks/][40]
+
+### isA
+
+helper to match an object with a referer
+
+#### Parameters
+
+-   `ObjectContstructor`  
+-   `object` **[Object][34]** 
+-   `ObjectConstructor` **[Object][34]** one of the javascript data type constructors
+
+Returns **[Boolean][33]** TypeCheck.isA(String, "this is a string"); => true
+TypeCheck.isA(Array, [1, 3, 5]); => true
 
 [1]: #cryptoutils
 
@@ -237,18 +284,34 @@ Returns **[Boolean][26]** true if from a sso redirect
 
 [24]: #ispageloadfromssoredirect
 
-[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[25]: #savedatainlocalstorage
 
-[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[26]: #parameters-4
 
-[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[27]: #getdatafromlocalstorage
 
-[28]: https://something.sso.com/
+[28]: #parameters-5
 
-[29]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[29]: #typecheck
 
-[30]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/null
+[30]: #isa
 
-[31]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[31]: #parameters-6
 
-[32]: https://openid.net/specs/openid-connect-core-1_0.html
+[32]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[33]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[35]: https://something.sso.com/
+
+[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[37]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/null
+
+[38]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[39]: https://openid.net/specs/openid-connect-core-1_0.html
+
+[40]: https://juhukinners.wordpress.com/2009/01/11/typeof-considered-useless-or-how-to-write-robust-type-checks/
