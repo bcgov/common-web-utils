@@ -20,7 +20,7 @@
 /* eslint-env es6 */
 
 'use strict';
-
+global.console.warn = jest.fn();
 import fs from 'fs';
 import path from 'path';
 import { ImplicitAuthManager } from '../src/libs/ImplicitAuthManager';
@@ -30,8 +30,6 @@ const encoded = fs.readFileSync(path0, 'utf8')
 
 const path1 = path.join(__dirname, 'fixtures/jwt-decoded-20181105.json');
 const decoded = JSON.parse(fs.readFileSync(path1, 'utf8'));
-
-jest.mock('../src/libs/localStorage');
 
 describe('Test ImplicitAuthManager', () => {
     let im;
@@ -43,7 +41,7 @@ describe('Test ImplicitAuthManager', () => {
         baseURL: 'https://example.com'
       });
 
-      im.isAReplayAttack = (key) => false;
+      ImplicitAuthManager.isAReplayAttack = (key) => false;
       im.saveAuthDataInLocal(encoded, encoded);
     });
   

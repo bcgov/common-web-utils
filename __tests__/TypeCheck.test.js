@@ -1,4 +1,6 @@
 import TypeCheck from '../src/libs/TypeCheck';
+global.console.warn = jest.fn();
+
 describe('TypeCheck class', () => {
   it('checks for objects', () => {
     const value = {};

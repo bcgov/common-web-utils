@@ -25,6 +25,7 @@ global.crypto = {
     return [1, 2, 3];
   },
 };
+global.console.warn = jest.fn();
 
 beforeEach(() => {
   jest.resetModules();
@@ -274,54 +275,30 @@ describe('Implicit Auth Manager Class', () => {
     // });
 
     test('when creating a nonce, the request key is stored in local storage', () => {
-      const config = {
-        clientId: '123',
-        baseURL: 'https://something.sso.ca',
-        realmName: '432',
-      };
-      const iam = new ImplicitAuthManager(config);
-      const nonce = iam.createNonce();
+      const nonce = ImplicitAuthManager.createNonce();
       const sso = getDataFromLocalStorage('sso');
       expect(sso.requestKey).toBeDefined();
       expect(nonce).toBeDefined();
     });
 
     test('when checking for a replay attack, it returns true if no request key has been stored', () => {
-      const config = {
-        clientId: '123',
-        baseURL: 'https://something.sso.ca',
-        realmName: '432',
-      };
-      const iam = new ImplicitAuthManager(config);
-      const nonce = iam.createNonce();
+      const nonce = ImplicitAuthManager.createNonce();
       //simulating that request key doesn't exist
       localStorage.clear();
-      expect(iam.isAReplayAttack(nonce)).toBe(true);
+      expect(ImplicitAuthManager.isAReplayAttack(nonce)).toBe(true);
     });
 
     test("when checking for replay attack, it returns true if request key doesn't match nonce", () => {
-      const config = {
-        clientId: '123',
-        baseURL: 'https://something.sso.ca',
-        realmName: '432',
-      };
-      const iam = new ImplicitAuthManager(config);
-      const nonce = iam.createNonce();
+      const nonce = ImplicitAuthManager.createNonce();
       //request key has been stored by createNonce
       const fakeNonce = 'fakenonce';
-      expect(iam.isAReplayAttack(fakeNonce)).toBe(true);
+      expect(ImplicitAuthManager.isAReplayAttack(fakeNonce)).toBe(true);
     });
 
     test('when checking for a replay attack, it returns false if nonce matches request key', () => {
-      const config = {
-        clientId: '123',
-        baseURL: 'https://something.sso.ca',
-        realmName: '432',
-      };
-      const iam = new ImplicitAuthManager(config);
-      const nonce = iam.createNonce();
+      const nonce = ImplicitAuthManager.createNonce();
       //request key has been stored by createNonce
-      expect(iam.isAReplayAttack(nonce)).toBe(false);
+      expect(ImplicitAuthManager.isAReplayAttack(nonce)).toBe(false);
     });
   });
 
@@ -332,27 +309,17 @@ describe('Implicit Auth Manager Class', () => {
       const value1Param = '23109482304923';
       const complexValueParam = '#$*)4!@#(*dsf8ad9f08a7sdf981239816547836423';
       const anotherValueParam = 'true';
-      const config = {
-        clientId: '123',
-        baseURL: 'https://something.sso.ca',
-        realmName: '432',
-      };
-      const iam = new ImplicitAuthManager(config);
-      expect(iam.getParameterByName(hash, 'value1')).toBe(value1Param);
-      expect(iam.getParameterByName(hash, 'complexValue')).toBe(complexValueParam);
-      expect(iam.getParameterByName(hash, 'anotherValue')).toBe(anotherValueParam);
+      
+      expect(ImplicitAuthManager.getParameterByName(hash, 'value1')).toBe(value1Param);
+      expect(ImplicitAuthManager.getParameterByName(hash, 'complexValue')).toBe(complexValueParam);
+      expect(ImplicitAuthManager.getParameterByName(hash, 'anotherValue')).toBe(anotherValueParam);
     });
 
     test("getParameterByName returned null if param doesn't exist inside hash", () => {
       const hash =
         '#value1=23109482304923&complexValue=#$*)4!@#(*dsf8ad9f08a7sdf981239816547836423&anotherValue=true';
-      const config = {
-        clientId: '123',
-        baseURL: 'https://something.sso.ca',
-        realmName: '432',
-      };
-      const iam = new ImplicitAuthManager(config);
-      expect(iam.getParameterByName(hash, 'notARealValue')).toBe(null);
+
+      expect(ImplicitAuthManager.getParameterByName(hash, 'notARealValue')).toBe(null);
     });
 
     test('isTokenExpired returns true when a token is expired', () => {
@@ -361,13 +328,8 @@ describe('Implicit Auth Manager Class', () => {
       const token = {
         exp: oldDate / 1000,
       };
-      const config = {
-        clientId: '123',
-        baseURL: 'https://something.sso.ca',
-        realmName: '432',
-      };
-      const iam = new ImplicitAuthManager(config);
-      expect(iam.isTokenExpired(token)).toBe(true);
+     
+      expect(ImplicitAuthManager.isTokenExpired(token)).toBe(true);
     });
 
     test('areTokensExpired returns true when no tokens exist', () => {
@@ -554,14 +516,8 @@ describe('Implicit Auth Manager Class', () => {
       window.location.hash =
         '#session_state=123123&access_token=342109908dfjlsdf&id_token=32123908123';
 
-      const config = {
-        clientId: '123',
-        baseURL: 'https://sso-dev.pathfinder.gov.bc.ca',
-        realmName: 'someRealm',
-        redirectURI: 'mysite.com',
-      };
-      const iam = new ImplicitAuthManager(config);
-      expect(iam.isPageLoadFromSSORedirect()).toBe(true);
+      
+      expect(ImplicitAuthManager.isPageLoadFromSSORedirect()).toBe(true);
     });
 
     test("registerHooks doesn't register if hooks are invalid", () => {

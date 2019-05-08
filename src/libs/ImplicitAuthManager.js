@@ -565,7 +565,7 @@ export class ImplicitAuthManager {
    * @param {String} accessToken
    * @param {String} idToken
    * @private
-   * @returns {Void}
+   * @returns {Boolean} true if saved
    */
   // eslint-disable-next-line
   saveAuthDataInLocal(accessToken, idToken) {
@@ -604,7 +604,6 @@ export class ImplicitAuthManager {
       }
 
       saveDataInLocalStorage('auth', auth);
-
       return true;
     } catch (e) {
       // need to figure out what would be appropriate here

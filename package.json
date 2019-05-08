@@ -89,7 +89,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "npx documentation build src/libs/ImplicitAuthManager.js -f md -o docs/ImplicitAuthManager.api.md && git add docs && git commit -m \"documentation update\""
+      "pre-push": "npx documentation build src/libs/ImplicitAuthManager.js -f md -o docs/ImplicitAuthManager.api.md && git add docs && git commit -m \"documentation update\" --no-verify"
     }
   },
   "lint-staged": {
