@@ -169,15 +169,7 @@ The above script is the recommended way of using the manager. The `handleOnPageL
   ```
   
 ## API
-
-### static methods
-these are mostly providers of constants that are attached to this class. They are consumed by the instance but may also be helpful outisde.
-```javascript
-  class.validResponseTypes() { array } // => returns all valid response types during auth as per open id connect implicit flow specs
-  class.validPromptTypes() { array } // => returns all valid prompt types during auth per open id connect implicit flow specs
-  class.validAPIIntentions() { object } // => returns all valid intentions which are used to construct redirect uri's
-  class.validHooks() { array } // => returns all valid hook types
-```
+> complete api docs can be found [here](./ImplicitAuthManager.api.md)
 
 ### getters
 
@@ -208,81 +200,6 @@ these are mostly providers of constants that are attached to this class. They ar
    iam.accessTokenForRequestHeader { String }
    /* Bearer asdflkj123123098dlk */
   ```
-
-### instance methods
-
-```javascript
-  instance.clearAuthLocalStorage(); { undefined } 
-  // clears local storage keys 'sso' and 'auth'
-
-  instance.createBaseAuthEndpointFromConfig(); { String } 
-  // with config builds the base sso authorization 
-  // end point as per open id connect specs
-
-  instance.createBaseLogoutEndpointFromConfig(); { String } 
-  // with config builds the base sso end session
-  // end point as per open id connect specs
-
-  instance.createNonce(); { String } 
-  // creates a request key which is automatically stored in 
-  // localstorage @ sso.requestKey and returns a hash of it to be used as a nonce
-
-  instance.isAReplayAttack(nonce { String }); { Boolean } 
-  // detects replay attack by comparing nonce with request key found in localstorage
-
-  instance.isTokenExpired(token { Object }); { Boolean }
-
-  instance.areTokensExpired(); { Boolean } 
-  // checks local storage for tokens and return true if ANY ONE token is expired
-
-  instance.getParameterByName(hash { String }, name { String }); { String } 
-  // parses a url fragment or hash (www.mysite.com#foo=bar)
-  // instance.getParameterByName(window.location.hash, 'foo');
-  
-  instance.getAccessTokenFromHash(hash { String }); { String }
-  // as above but looks for 'access_token' within hash
-  
-  instance.getIdTokenFromHash(hash { String }); { String }
-  // as above but looks for 'id_token' within hash
-
-  instance.getErrorFromHash(hash { String }); { String }
-  // as above but looks for 'error' within hash
-
-  instance.getAccessTokenFromLocal(); { Object } 
-  // returns jwt token + parsed data or undefined if not found
-
-  instance.getIdTokenFromLocal(); { Object } 
-  // returns jwt token + parsed data or undefined if not found
-
-  instance.saveAuthDataInLocal(accessToken { Object || undefined }, idToken { Object || undefined}); { Boolean } 
-  // automatically checks for replay attacks by comparing nonce within token with request key
-  // if tokens are not parsable or if a replay attack had occured then the tokens will not be saved
-  // and false is returned
-  // if tokens are valid true is returned
-
-  instance.getSSOLoginURIForPageLoadRedirect() { String }
-  // very similar to instance.ssoLoginURI with the exception of the query parameter &prompt=none
-  // which prevents the user being forced to login into the sso authentication server
-
-  instance.handleOnPageLoad() { undefined }
-  // MAIN routine. this will be described in detail below
-
-  instance.getAuthDataFromLocal() { Object }
-  // returns the tokens saved in localstorage.auth
-
-  instance.isPageLoadHashValidForAuthentication() { Boolean }
-  // returns false if url fragment/hash doesn't match the expected shape we'd recieve from the sso server
-  
-  instance.isAuthenticated() { Boolean }
-  // returns true/false based on if valid/non-expired tokens exist in local storage
-
-  instance.setTokenExpiryTimers() { undefined }
-  // sets the expiry timers via setTimeout
-  // the onTokenExpired event is fired within the setTimeout callback
-
-  instance.registerHooks(hooks {Object})
-  // set hooks (new hooks merged in with any existing hooks)
-```
 
 #### handleOnPageLoad Routine
 

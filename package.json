@@ -56,7 +56,8 @@
     "test": "NODE_ENV=test jest __tests__ --env=jsdom",
     "test:watch": "NODE_ENV=test jest __tests__ --watch --env=jsdom",
     "test:lint": "eslint --env node --ext .js src",
-    "prettier": "prettier --write '{./,__{tests,mocks}__}/**/*.+(js|jsx)'"
+    "prettier": "prettier --write '{./,__{tests,mocks}__}/**/*.+(js|jsx)'",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -86,7 +87,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "pre-push": "npx documentation build src/libs/ImplicitAuthManager.js -f md -o docs/ImplicitAuthManager.api.md && git add docs && git commit -m \"documentation update\""
     }
   },
   "lint-staged": {

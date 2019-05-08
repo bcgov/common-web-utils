@@ -19,7 +19,7 @@
 
 'use strict';
 
-import hash from 'hash.js';
+import hashJs from 'hash.js';
 import jwtDecode from 'jwt-decode';
 import moment from 'moment';
 import {
@@ -53,7 +53,7 @@ export class CryptoUtils {
     if (typeof value !== 'string') {
       throw new Error('Value must be of type String in order to hash');
     }
-    return hash
+    return hashJs
       .sha256()
       .update(value)
       .digest('hex');
@@ -62,7 +62,7 @@ export class CryptoUtils {
   /**
    * hashes the value and checks against a hash to see if they match
    * @param {string} value
-   * @param {string} hash
+   * @param {string} hashedValue
    * @returns {boolean} true if value matches hash
    */
   static checkAgainstHash(value, hashedValue) {
@@ -71,32 +71,27 @@ export class CryptoUtils {
 }
 /**
  * Utility Class for Management of OCID Implicit Auth Flow
- * @param {object} config
- * expected shape
- * {
- *   kcIDPHint: {string} [optional] identity provider hint so that sso boots you straight to the provider
- *   clientId: {string} [required] client id within your realm,
- *   baseURL: {string} [required] your redhat sso domain,
- *   realmName: {string} [required] name of your realm within the domain,
- *   redirectURI: {string} | {function} [optional] defaults to window.location.origin + intention
- *   // if redirect URI is a string, during login/logout processes the redirectURI will have a query param appended to it
- *   // based on the intention of the process: ie if the call to the authorization server is intended for logging in
- *   // the redirect uri will = redirect_uri + ?intention=LOGIN
- *   // --
- *   // you may make the redirect URI a call back function that receives the intention as an argument
- *   // view the validAPIIntentions static function for all the possible intentions that you may want to handle
- *   loginURIResponseType: {string} [optional] defaults to id_token (options are token | id_token | id_token token)
- *   // please view https://stackoverflow.com/questions/19293793/oauth-2-access-token-vs-openid-connect-id-token
- *   // for clarification on the difference between token types
- *   hooks: {
- *      onBeforeAuthRedirect: {function},
- *      onAfterAuthRedirect: {function} [error {boolean}],
- *      onAuthLocalStorageCleared: {function},
- *      onTokenExpired: {function},
- *      onAuthenticateSuccess: {function},
- *      onAuthenticateFail: {function}
- *   }
- * }
+ * @param {Object} config the config object, * = optional properties
+ * @param {String} config.kcIDPHint * identity provider hint so that sso boots you straight to the provider
+ * @param {String} config.baseURL  your sso providers base url eg https://something.sso.com/
+ * @param {String} config.clientId  client id within your sso realm
+ * @param {String} config.realmName  name of your sso realm
+ * @param {String | Function} config.redirectURI * Defaults to window.location.origin + intention
+ * if redirect URI is a string, during login/logout processes the redirectURI will have a query param appended to it
+ * based on the intention of the process: ie if the call to the authorization server is intended for logging in
+ * the redirect uri will = redirect_uri + ?intention=LOGIN
+ * --
+ * you may make the redirect URI a call back function that receives the intention as an argument
+ * view the validAPIIntentions static function for all the possible intentions that you may want to handle
+ * @param {String} loginURIResponseType * defaults to id_token, options are ['token', 'id_token', 'id_token token']
+ * @param {Object} hooks * a set of callback functions that may be utilized to tie in ImplicitAuth Processes to your
+ * code
+ * @param {Function} hooks.onBeforeAuthRedirect called before a redirect occurs
+ * @param {Function} hooks.onAfterAuthRedirect: called after a successful redirect back to your client has occured
+ * @param {Function} hooks.onAuthLocalStorageCleared
+ * @param {Function} hooks.onTokenExpired
+ * @param {Function} hooks.onAuthenticateSuccess
+ * @param {Function} hooks.onAuthenticateFail
  */
 
 // ImplicitAuthManager takes two names in the local storage space
@@ -117,6 +112,12 @@ export class ImplicitAuthManager {
     this.baseLogoutEndpoint = this.createBaseLogoutEndpointFromConfig();
   }
 
+  /**
+   * returns the default configuration for the instance
+   * usage: instance.defaultConfig
+   * @returns {Object}
+   * @private
+   */
   // eslint-disable-next-line
   get defaultConfig() {
     return {
@@ -132,30 +133,64 @@ export class ImplicitAuthManager {
     };
   }
 
+  /**
+   * returns all hooks
+   * usage: instance.hooks;
+   * @returns {Object}
+   * @private
+   */
   get hooks() {
     return this.config.hooks;
   }
 
+  /**
+   * returns the redirect uri
+   * @returns {String}
+   */
   get redirectURI() {
     return this.config.redirectURI || window.location.origin;
   }
 
+  /**
+   * returns the sso logout uri to be implemented by something like an anchor tag
+   * or a 'navigate' function call
+   * usage: instance.ssoLogoutURI;
+   * @returns {String}
+   */
   get ssoLogoutURI() {
     return this.getSSOLogoutURI();
   }
 
+  /**
+   * returns the sso login uri to be implemented by something like an anchor tag
+   * or a 'navigate' function call
+   * * usage: instance.ssoLoginURI;
+   * @returns {String}
+   */
   get ssoLoginURI() {
     return this.getSSOLoginURI();
   }
 
+  /**
+   * returns the access token if exists in local storage
+   * @returns {Object | Null}
+   */
   get accessToken() {
     return this.getAccessTokenFromLocal();
   }
 
+  /**
+   * returns the id token if exists in local storage
+   * @returns {Object | Null}
+   */
   get idToken() {
     return this.getIdTokenFromLocal();
   }
 
+  /**
+   * returns a bearer id token to leverage in an API request header
+   * @returns {String}
+   */
   get idTokenForRequestHeader() {
     const token = this.getIdTokenFromLocal();
     if (token && token.bearer) {
@@ -164,6 +199,10 @@ export class ImplicitAuthManager {
     return null;
   }
 
+  /**
+   * returns a bearer access token to leverage in an API request header
+   * @returns {String}
+   */
   get accessTokenForRequestHeader() {
     const token = this.getAccessTokenFromLocal();
     if (token && token.bearer) {
@@ -172,23 +211,41 @@ export class ImplicitAuthManager {
     return null;
   }
 
+  /**
+   * returns a list of roles from the id token if exists
+   * @returns {Array}
+   */
   get roles() {
     const { data } = this.getIdTokenFromLocal();
     return data && data.roles ? data.roles : [];
   }
 
-  // returns the valid response types for implicit auth flow response_type query param
+  /**
+   *  returns the valid response types for implicit auth flow response_type query param
+   *  @returns {Array}
+   *  @private
+   * */
   static validResponseTypes() {
     return ['id_token', 'token', 'id_token token'];
   }
 
+  /**
+   *  returns the valid prompt types for implicit auth flow response_type query param
+   *  @returns {Array}
+   *  @private
+   * */
   static validPromptTypes() {
     return ['none', 'login', 'consent', 'select_account'];
   }
 
-  // returns valid api intentions which are bound the the redirect uri as a queryparam
-  // ?intention=[intention], if redirectURI is a function, the intention is passed in to
-  // the redirectURI function so that you may choose how you want to construct your redirectURI
+  /**
+   *
+   * returns valid api intentions which are bound the the redirect uri as a queryparam
+   * ?intention=[intention], if redirectURI is a function, the intention is passed in to
+   * the redirectURI function so that you may choose how you want to construct your redirectURI
+   * @returns {Object}
+   * @private
+   */
   static validAPIIntentions() {
     return {
       LOGIN: 'LOGIN',
@@ -196,6 +253,11 @@ export class ImplicitAuthManager {
     };
   }
 
+  /**
+   * returns valid hooks for validation purposes
+   * @returns {Object}
+   * @private
+   */
   static validHooks() {
     return [
       'onBeforeAuthRedirect',
@@ -207,6 +269,11 @@ export class ImplicitAuthManager {
     ];
   }
 
+  /**
+   * clears all data from local storage relevant to the implicit auth manager
+   * the localstorage keys that are cleared are 'sso' and 'auth'
+   * @returns {void}
+   */
   clearAuthLocalStorage() {
     this.hooks.onAuthLocalStorageCleared();
     // delete sso information and token information
@@ -214,15 +281,31 @@ export class ImplicitAuthManager {
     deleteDataFromLocalStorage('auth');
   }
 
+  /**
+   * creates the sso base endpoint
+   * @private
+   * @returns {String}
+   */
   createBaseAuthEndpointFromConfig() {
     const uriConf = this.config;
     return `${uriConf.baseURL}/auth/realms/${uriConf.realmName}/protocol/openid-connect/auth`;
   }
 
+  /**
+   * creates the sso base logout endpoint
+   * @private
+   * @returns {String}
+   */
   createBaseLogoutEndpointFromConfig() {
     const uriConf = this.config;
     return `${uriConf.baseURL}/auth/realms/${uriConf.realmName}/protocol/openid-connect/logout`;
   }
+
+  /**
+   * validates the configuration, throws if any checks fail
+   * @private
+   * @returns {Void}
+   */
   // eslint-disable-next-line
   validateConfig(config) {
     if (!TypeCheck.isObject(config)) {
@@ -282,6 +365,12 @@ export class ImplicitAuthManager {
       this.areHooksValid(config.hooks);
     }
   }
+
+  /**
+   * validates the hook objects
+   * @private
+   * @returns {Void}
+   */
   // eslint-disable-next-line
   areHooksValid(hooks) {
     if (!TypeCheck.isObject(hooks)) {
@@ -301,6 +390,13 @@ export class ImplicitAuthManager {
     });
   }
 
+  /**
+   * allows you to subscribe to hooks that will be called in the future
+   * this replaces an preexisting hooks
+   * it is not required that you register to all hooks
+   * @param {Object} hooks the hook callbacks that you are subscribing too
+   * @returns {Void}
+   */
   registerHooks(hooks) {
     try {
       this.areHooksValid(hooks);
@@ -310,25 +406,45 @@ export class ImplicitAuthManager {
       console.error("hooks are invalid and weren't registered");
     }
   }
-  // eslint-disable-next-line
-  createRequestKey() {
+
+  /**
+   * creates a cryptographically random request key for the generation of the nonce
+   * @returns {String} a request key for the implicit auth nonce creation routine
+   * @private
+   */
+  static createRequestKey() {
     return CryptoUtils.genCryptographicRandomValue();
   }
 
-  createNonce() {
-    const requestKey = this.createRequestKey();
+  /**
+   * creates a nonce which is based off the open id connect spec for implicit auth requests
+   * @returns {String} the hashed nonce
+   * @private
+   */
+  static createNonce() {
+    const requestKey = ImplicitAuthManager.createRequestKey();
     // save request key in local storage for reference on auth redirect
     saveDataInLocalStorage('sso', { requestKey });
     // hash requestKey and return as nonce
     return CryptoUtils.hashSHA256(requestKey);
   }
-  // eslint-disable-next-line
-  clearNonce() {
+
+  /**
+   * deletes the nonce from local storage
+   * @private
+   * @returns {Void}
+   */
+  static clearNonce() {
     deleteDataFromLocalStorage('sso');
   }
 
-  // eslint-disable-next-line
-  isAReplayAttack(nonce) {
+  /**
+   * detects replay attacks by comparing nonce coming from url with one in local storage
+   * @private
+   * @param {String} nonce
+   * @returns {Boolean} true if this could be a replay attack
+   */
+  static isAReplayAttack(nonce) {
     // this could be a replay attack if the nonce contained with the jwt doesn't match
     // the hashed request key that SHOULD be in local storage
     const sso = getDataFromLocalStorage('sso');
@@ -338,11 +454,21 @@ export class ImplicitAuthManager {
     return true;
   }
 
-  // eslint-disable-next-line
-  isTokenExpired(token) {
+  /**
+   * checks if the jwt has expired
+   * @private
+   * @param {Object} token the decoded jwt token
+   * @param {String | Number} token.exp the tokens expiry date
+   * @returns {Boolean} true if the token is expired
+   */
+  static isTokenExpired(token) {
     return new Date() / 1000 > token.exp;
   }
 
+  /**
+   * checks if stored jwt tokens have expired
+   * @returns {Boolean} true if the token is expired
+   */
   areTokensExpired() {
     // get tokens
     const tokens = this.getAuthDataFromLocal();
@@ -351,41 +477,81 @@ export class ImplicitAuthManager {
       return true;
     }
 
-    return Object.keys(tokens).filter(item => this.isTokenExpired(tokens[item].data)).length > 0;
+    return (
+      Object.keys(tokens).filter(item => ImplicitAuthManager.isTokenExpired(tokens[item].data))
+        .length > 0
+    );
   }
 
-  // based on the hash value returned from an implicit auth redirect
-  // return a parameter by its name
-  // eslint-disable-next-line
-  getParameterByName(urlHash, name) {
+  /**
+   * returns a parameter that exists within the hash '#' of a uri from the implicit auth redirect
+   * @param {String} urlHash
+   * @param {String} name
+   * @private
+   * @returns {String} the paramater value
+   */
+  static getParameterByName(urlHash, name) {
     const match = RegExp(`[#&]${name}=([^&]*)`).exec(urlHash);
     return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
   }
 
-  getAccessTokenFromHash(urlHash) {
-    return this.getParameterByName(urlHash, 'access_token');
+  /**
+   * returns the access token string
+   * @param {String} urlHash
+   * @private
+   * @returns {String} the access token string
+   */
+  static getAccessTokenFromHash(urlHash) {
+    return ImplicitAuthManager.getParameterByName(urlHash, 'access_token');
   }
 
-  getIdTokenFromHash(urlHash) {
-    return this.getParameterByName(urlHash, 'id_token');
+  /**
+   * returns the id token string
+   * @param {String} urlHash
+   * @private
+   * @returns {String} the id token string
+   */
+  static getIdTokenFromHash(urlHash) {
+    return ImplicitAuthManager.getParameterByName(urlHash, 'id_token');
   }
 
-  getErrorFromHash(urlHash) {
-    return this.getParameterByName(urlHash, 'error');
+  /**
+   * returns the error string
+   * @param {String} urlHash
+   * @private
+   * @returns {String} the error
+   */
+  static getErrorFromHash(urlHash) {
+    return ImplicitAuthManager.getParameterByName(urlHash, 'error');
   }
 
-  getSessionStateFromHash(urlHash) {
-    return this.getParameterByName(urlHash, 'session_state');
+  /**
+   * returns the session state
+   * @param {String} urlHash
+   * @private
+   * @returns {String} the session state
+   */
+  static getSessionStateFromHash(urlHash) {
+    return ImplicitAuthManager.getParameterByName(urlHash, 'session_state');
   }
 
-  // eslint-disable-next-line
+  /**
+   * gets access token that exists in local storage
+   * @returns {Object} the access token if exists, otherwise undefined
+   */
+  // eslint-disable-next-line class-methods-use-this
   getAccessTokenFromLocal() {
     const authData = getDataFromLocalStorage('auth');
     if (authData) {
       return authData.accessToken;
     }
+    return undefined;
   }
 
+  /**
+   * gets id token that exists in local storage
+   * @returns {Object} the id token if exists, otherwise undefined
+   */
   // eslint-disable-next-line
   getIdTokenFromLocal() {
     const authData = getDataFromLocalStorage('auth');
@@ -394,6 +560,13 @@ export class ImplicitAuthManager {
     }
   }
 
+  /**
+   * verifies access and id tokens and saves them in local storage if all checks pass
+   * @param {String} accessToken
+   * @param {String} idToken
+   * @private
+   * @returns {Void}
+   */
   // eslint-disable-next-line
   saveAuthDataInLocal(accessToken, idToken) {
     try {
@@ -407,7 +580,7 @@ export class ImplicitAuthManager {
         };
 
         // ensure access token nonce matches
-        if (this.isAReplayAttack(auth.accessToken.data.nonce)) {
+        if (ImplicitAuthManager.isAReplayAttack(auth.accessToken.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
@@ -419,7 +592,7 @@ export class ImplicitAuthManager {
           bearer: idToken,
         };
 
-        if (this.isAReplayAttack(auth.idToken.data.nonce)) {
+        if (ImplicitAuthManager.isAReplayAttack(auth.idToken.data.nonce)) {
           throw new Error('Authentication failed due to possible replay attack');
         }
       }
@@ -439,6 +612,10 @@ export class ImplicitAuthManager {
     }
   }
 
+  /**
+   * gets the sso logout uri to be used by your front end
+   * @returns {String} the logout uri
+   */
   getSSOLogoutURI() {
     const apiIntentions = ImplicitAuthManager.validAPIIntentions();
     const redirectURI = this.getSSORedirectURI(apiIntentions.LOGOUT);
@@ -446,6 +623,13 @@ export class ImplicitAuthManager {
     return encodeURI(logoutURI);
   }
 
+  /**
+   * returns the sso login uri, this function accepts a prompt to modify the behaviour of logging in
+   * @param {String} prompt ['none', 'login', 'consent', 'select_account']
+   * as per open id spec the prompt is OPTIONAL and default to login
+   * more info can be found here https://openid.net/specs/openid-connect-core-1_0.html (search for prompt)
+   * @returns {String} the login uri
+   */
   getSSOLoginURI(prompt = 'login') {
     if (!ImplicitAuthManager.validPromptTypes().includes(prompt)) {
       throw new Error(`Prompt type must one of ${ImplicitAuthManager.validPromptTypes()}`);
@@ -454,7 +638,7 @@ export class ImplicitAuthManager {
     const apiIntentions = ImplicitAuthManager.validAPIIntentions();
     const uriConf = this.config;
     const redirectURI = this.getSSORedirectURI(apiIntentions.LOGIN);
-    const nonce = this.createNonce();
+    const nonce = ImplicitAuthManager.createNonce();
     const kcIDPHint = uriConf.kcIDPHint ? `&kc_idp_hint=${uriConf.kcIDPHint}` : '';
     const loginURI = `${this.baseAuthEndpoint}?response_type=${
       uriConf.loginURIResponseType
@@ -464,18 +648,22 @@ export class ImplicitAuthManager {
     return encodeURI(loginURI);
   }
 
-  // returns no prompt for user
+  /**
+   * gets the login uri to be used by implicit auth manager itself, the prompt is none
+   * so that on authentication fail, the user is redirected back to the client
+   * @private
+   * @returns {String} the login uri
+   */
   getSSOLoginURIForPageLoadRedirect() {
     return this.getSSOLoginURI('none');
   }
 
-  // creates the redirect URI
-  // it can be retrieved by a config or
-  // grabbing window.location.origin by default
-  // this method recieves an 'intention' for the redirect
-  // for example if logging in, the api intention used will be 'LOGIN' which is then
-  // passed back in the redirect as a query param to allow your client to handle redirects
-  // differently based on the intention as needed
+  /**
+   * creates the sso redirect uri
+   * @param {String} apiIntention LOGIN | LOGOUT
+   * @private
+   * @returns {String} the redirect uri
+   */
   getSSORedirectURI(apiIntention) {
     // this.redirectURI via getter
     return TypeCheck.isFunction(this.redirectURI)
@@ -483,28 +671,34 @@ export class ImplicitAuthManager {
       : `${this.redirectURI}?intention=${apiIntention}&sso=true`;
   }
 
+  /**
+   * this is the main routine for the manager, it should be called on page load at all times
+   * it detects a implicit authentication in the browsers url and stores tokens when verified
+   * @private
+   * @returns {Void}
+   */
   handleOnPageLoad() {
     if (this.isAuthenticated()) {
       // set expiry timers
       this.setTokenExpiryTimers();
       this.hooks.onAuthenticateSuccess();
       // fire user authenticated hook
-    } else if (!this.isPageLoadFromSSORedirect()) {
+    } else if (!ImplicitAuthManager.isPageLoadFromSSORedirect()) {
       // this definition should and will change as a better method for detecting a redirect
       // is made apparent
       this.hooks.onBeforeAuthRedirect();
       // force redirect to get authenticated
       const ssoLoginURI = this.getSSOLoginURIForPageLoadRedirect();
-      // eslint-disable-next-line
+
       window.location.replace(ssoLoginURI);
     } else {
       this.hooks.onAfterAuthRedirect();
-      // eslint-disable-next-line
-      const hash = window.location.hash;
-      // eslint-disable-next-line
-      const accessToken = this.getAccessTokenFromHash(hash);
-      // eslint-disable-next-line
-      const idToken = this.getIdTokenFromHash(hash);
+
+      const { hash } = window.location;
+
+      const accessToken = ImplicitAuthManager.getAccessTokenFromHash(hash);
+
+      const idToken = ImplicitAuthManager.getIdTokenFromHash(hash);
       const authenticated = this.saveAuthDataInLocal(accessToken, idToken);
       if (authenticated) {
         // fire authenticated eventt
@@ -517,41 +711,58 @@ export class ImplicitAuthManager {
         this.clearAuthLocalStorage();
       }
       // clear nonce
-      this.clearNonce();
+      ImplicitAuthManager.clearNonce();
     }
   }
 
+  /**
+   * gets the auth data from local storage
+   * @returns {Object}
+   * @private
+   */
   // eslint-disable-next-line
   getAuthDataFromLocal() {
     return getDataFromLocalStorage('auth');
   }
 
-  // tests where correct params exist in hash AND not if the tokens are valid
-  isPageLoadHashValidForAuthentication() {
+  /**
+   * validates the redirect hash has session state and an id token or access token
+   * @returns {Boolean} true if valid
+   */
+  static isPageLoadHashValidForAuthentication() {
     const urlHash = window.location.hash;
-    // eslint-disable-next-line
-    const session_state = this.getSessionStateFromHash(urlHash);
-    // eslint-disable-next-line
-    const idToken = this.getIdTokenFromHash(urlHash);
-    // eslint-disable-next-line
-    const accessToken = this.getAccessTokenFromHash(urlHash);
-    // eslint-disable-next-line
-    return !session_state || (!idToken || !accessToken);
+
+    const sessionState = ImplicitAuthManager.getSessionStateFromHash(urlHash);
+
+    const idToken = ImplicitAuthManager.getIdTokenFromHash(urlHash);
+
+    const accessToken = ImplicitAuthManager.getAccessTokenFromHash(urlHash);
+
+    return !sessionState || (!idToken || !accessToken);
   }
 
-  // a redirect should have atleast one of a idToken or accessToken or have an error
-  isPageLoadFromSSORedirect() {
-    // eslint-disable-next-line
-    const hash = window.location.hash;
-    // eslint-disable-next-line
-    const idToken = this.getAccessTokenFromHash(hash);
-    // eslint-disable-next-line
-    const accessToken = this.getIdTokenFromHash(hash);
-    const error = this.getErrorFromHash(hash);
-    // eslint-disable-next-line
+  /**
+   * detects whether page was loaded because of a redirect from the sso provider
+   * @returns {Boolean} true if from a sso redirect
+   */
+  static isPageLoadFromSSORedirect() {
+    const { hash } = window.location;
+
+    const idToken = ImplicitAuthManager.getAccessTokenFromHash(hash);
+
+    const accessToken = ImplicitAuthManager.getIdTokenFromHash(hash);
+    const error = ImplicitAuthManager.getErrorFromHash(hash);
+
     return idToken !== null || accessToken !== null || error !== null;
   }
 
+  /**
+   * checks if session is considered to be authenticated
+   * * when tokens exist and are not expired
+   * @returns {Boolean} true if session is considered authenticated
+   * @private
+   */
+  // eslint-disable-next-line class-methods-use-this
   isAuthenticated() {
     // do we have auth data saved in local storage and are tokens not expired
     const auth = getDataFromLocalStorage('auth');
@@ -564,11 +775,16 @@ export class ImplicitAuthManager {
     }
     // if either token is expired user is not authenticated
     return !(
-      (auth.idToken && this.isTokenExpired(auth.idToken.data)) ||
-      (auth.accessToken && this.isTokenExpired(auth.accessToken.data))
+      (auth.idToken && ImplicitAuthManager.isTokenExpired(auth.idToken.data)) ||
+      (auth.accessToken && ImplicitAuthManager.isTokenExpired(auth.accessToken.data))
     );
   }
 
+  /**
+   * sets a timer to expire tokens
+   * @private
+   * @returns {Void}
+   */
   setTokenExpiryTimers() {
     // get tokens
     const tokens = this.getAuthDataFromLocal();
