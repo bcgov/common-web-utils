@@ -22,12 +22,12 @@
 import hash from 'hash.js';
 import jwtDecode from 'jwt-decode';
 import moment from 'moment';
+import { isString, isFunction, isPlainObject } from 'lodash';
 import {
   deleteDataFromLocalStorage,
   getDataFromLocalStorage,
   saveDataInLocalStorage,
 } from './localStorage';
-import TypeCheck from './TypeCheck';
 
 // stub crypto if doesn't exist
 if (typeof window !== 'undefined' && window.crypto === undefined) {
@@ -225,13 +225,13 @@ export class ImplicitAuthManager {
   }
   // eslint-disable-next-line
   validateConfig(config) {
-    if (!TypeCheck.isObject(config)) {
+    if (!isPlainObject(config)) {
       throw new Error('config must be an object');
     }
-    if (!config.clientId || !TypeCheck.isString(config.clientId)) {
+    if (!config.clientId || !isString(config.clientId)) {
       throw new Error('client id in config must be present and typeof [string]');
     }
-    if (!config.baseURL || !TypeCheck.isString(config.baseURL)) {
+    if (!config.baseURL || !isString(config.baseURL)) {
       throw new Error('base url in config must be present and typeof [string]');
     }
 
@@ -239,33 +239,30 @@ export class ImplicitAuthManager {
       throw new Error('base url must start with https://');
     }
 
-    if (!config.realmName || !TypeCheck.isString(config.realmName)) {
+    if (!config.realmName || !isString(config.realmName)) {
       throw new Error('realm name in config must be present and typeof [string]');
     }
 
-    if (config.kcIDPHint && !TypeCheck.isString(config.kcIDPHint)) {
+    if (config.kcIDPHint && !isString(config.kcIDPHint)) {
       throw new Error('kcIDPHint in config must be typeof [string]');
     }
 
     if (config.redirectURI) {
       // if its a function, test if the function returns a string
       if (
-        TypeCheck.isFunction(config.redirectURI) &&
-        !TypeCheck.isString(config.redirectURI(ImplicitAuthManager.validAPIIntentions.LOGIN))
+        isFunction(config.redirectURI) &&
+        !isString(config.redirectURI(ImplicitAuthManager.validAPIIntentions.LOGIN))
       ) {
         throw new Error('If passing in a custom redirectURI as a function it must return a string');
         // otherwise make sure redirectURI is a string
-      } else if (
-        !TypeCheck.isFunction(config.redirectURI) &&
-        !TypeCheck.isString(config.redirectURI)
-      ) {
+      } else if (!isFunction(config.redirectURI) && !isString(config.redirectURI)) {
         throw new Error(
           'If passing in a custom redirectURI it must either be a function or a string'
         );
       }
     }
     // if login URI responseType was passed in
-    if (config.loginURIResponseType && !TypeCheck.isString(config.loginURIResponseType)) {
+    if (config.loginURIResponseType && !isString(config.loginURIResponseType)) {
       throw new Error('loginURIResponseType in config must be typeof [string]');
     }
 
@@ -284,7 +281,7 @@ export class ImplicitAuthManager {
   }
   // eslint-disable-next-line
   areHooksValid(hooks) {
-    if (!TypeCheck.isObject(hooks)) {
+    if (!isPlainObject(hooks)) {
       throw new Error('hooks in config must be typeof [object]');
     }
     const validHooks = ImplicitAuthManager.validHooks();
@@ -295,7 +292,7 @@ export class ImplicitAuthManager {
           `${hook} in config.hooks is not a valid hook, please see API Docs for information on valid hooks`
         );
       }
-      if (!TypeCheck.isFunction(hooks[hook])) {
+      if (!isFunction(hooks[hook])) {
         throw new Error(`config.hooks.${hook} must be typeof [function]`);
       }
     });
@@ -332,7 +329,7 @@ export class ImplicitAuthManager {
     // this could be a replay attack if the nonce contained with the jwt doesn't match
     // the hashed request key that SHOULD be in local storage
     const sso = getDataFromLocalStorage('sso');
-    if (TypeCheck.isObject(sso) && sso.requestKey) {
+    if (isPlainObject(sso) && sso.requestKey) {
       return !CryptoUtils.checkAgainstHash(sso.requestKey, nonce);
     }
     return true;
@@ -478,7 +475,7 @@ export class ImplicitAuthManager {
   // differently based on the intention as needed
   getSSORedirectURI(apiIntention) {
     // this.redirectURI via getter
-    return TypeCheck.isFunction(this.redirectURI)
+    return isFunction(this.redirectURI)
       ? this.redirectURI(apiIntention)
       : `${this.redirectURI}?intention=${apiIntention}&sso=true`;
   }
