@@ -25,6 +25,7 @@
   "dependencies": {
     "hash.js": "^1.1.5",
     "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.11",
     "moment": "^2.22.2",
     "window": "^4.2.5"
   },
