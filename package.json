@@ -64,6 +64,7 @@
     "transform": {
       ".(js|jsx)": "babel-jest"
     },
+    "modulePathIgnorePatterns": ["<rootDir>/dist/"],
     "testRegex": "(\\.(test|spec))\\.(jsx|js)$",
     "testPathIgnorePatterns": [
       "/node_modules/"
