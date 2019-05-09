@@ -1,6 +1,6 @@
 {
   "name": "@bcgov/common-web-utils",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "",
   "engine": "node 8.4.0",
   "main": "dist/index.js",
@@ -64,7 +64,9 @@
     "transform": {
       ".(js|jsx)": "babel-jest"
     },
-    "modulePathIgnorePatterns": ["<rootDir>/dist/"],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ],
     "testRegex": "(\\.(test|spec))\\.(jsx|js)$",
     "testPathIgnorePatterns": [
       "/node_modules/"
