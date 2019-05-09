@@ -1,8 +1,6 @@
 {
-    "presets": ["env"],
+    "presets": ["@babel/preset-env"],
     "plugins": [
-        "add-module-exports",
-        "transform-export-default",
-        "transform-object-rest-spread"
+        "@babel/plugin-proposal-export-default-from"
     ]
 }

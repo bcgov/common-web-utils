@@ -21,4 +21,4 @@ export {
   saveDataInLocalStorage,
   deleteDataFromLocalStorage,
   getDataFromLocalStorage,
-} from './libs/localStorage.js';
+} from './libs/localStorage';
