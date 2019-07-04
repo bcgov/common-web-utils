@@ -26,7 +26,8 @@
     "hash.js": "^1.1.7",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "snyk": "^1.190.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -54,7 +55,9 @@
     "test": "NODE_ENV=test jest __tests__ --env=jsdom",
     "test:watch": "NODE_ENV=test jest __tests__ --watch --env=jsdom",
     "test:lint": "eslint --env node --ext .js src",
-    "prettier": "prettier --write '{./,__{tests,mocks}__}/**/*.+(js|jsx)'"
+    "prettier": "prettier --write '{./,__{tests,mocks}__}/**/*.+(js|jsx)'",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -95,5 +98,6 @@
       "eslint --fix",
       "git add"
     ]
-  }
+  },
+  "snyk": true
 }
