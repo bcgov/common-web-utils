@@ -51,6 +51,7 @@
   },
   "scripts": {
     "build": "babel src --out-dir dist",
+    "prepare": "babel src --out-dir dist",
     "test": "NODE_ENV=test jest __tests__ --env=jsdom",
     "test:watch": "NODE_ENV=test jest __tests__ --watch --env=jsdom",
     "test:lint": "eslint --env node --ext .js src",
