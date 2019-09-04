@@ -466,18 +466,28 @@ export class ImplicitAuthManager {
     return this.getSSOLoginURI('none');
   }
 
+  static doesHaveSearch(uri) {
+    return uri.indexOf('?') > -1;
+  }
+
   // creates the redirect URI
   // it can be retrieved by a config or
   // grabbing window.location.origin by default
-  // this method recieves an 'intention' for the redirect
+  // this method receives an 'intention' for the redirect
   // for example if logging in, the api intention used will be 'LOGIN' which is then
   // passed back in the redirect as a query param to allow your client to handle redirects
   // differently based on the intention as needed
   getSSORedirectURI(apiIntention) {
     // this.redirectURI via getter
-    return isFunction(this.redirectURI)
-      ? this.redirectURI(apiIntention)
-      : `${this.redirectURI}?intention=${apiIntention}&sso=true`;
+
+    if (isFunction(this.redirectURI)) {
+      return this.redirectURI(apiIntention);
+    }
+    // if redirect uri contains a query param we append intention ontop of it
+    const intentionAppendCharacter = ImplicitAuthManager.doesHaveSearch(this.redirectURI)
+      ? '&'
+      : '?';
+    return `${this.redirectURI}${intentionAppendCharacter}intention=${apiIntention}&sso=true`;
   }
 
   handleOnPageLoad() {
@@ -541,9 +551,9 @@ export class ImplicitAuthManager {
     // eslint-disable-next-line
     const hash = window.location.hash;
     // eslint-disable-next-line
-    const idToken = this.getAccessTokenFromHash(hash);
+    const accessToken = this.getAccessTokenFromHash(hash);
     // eslint-disable-next-line
-    const accessToken = this.getIdTokenFromHash(hash);
+    const idToken = this.getIdTokenFromHash(hash);
     const error = this.getErrorFromHash(hash);
     // eslint-disable-next-line
     return idToken !== null || accessToken !== null || error !== null;
