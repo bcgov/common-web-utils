@@ -157,6 +157,18 @@ describe('Implicit Auth Manager Class', () => {
       expect(new ImplicitAuthManager(config).config.loginURIResponseType).toBeDefined();
     });
 
+    it('returns a redirectURI with multiple query params', () => {
+      const config = {
+        clientId: '123',
+        baseURL: 'https://something.sso.ca',
+        realmName: '432',
+        redirectURI: 'https://google.com/?q=foo',
+      };
+
+      const iam = new ImplicitAuthManager(config);
+      expect(iam.getSSORedirectURI('LOGIN')).toBe('https://google.com/?q=foo&intention=LOGIN&sso=true');
+    });
+
     it('throws if redirectURI in config is not of type string', () => {
       const config = {
         clientId: '123',
