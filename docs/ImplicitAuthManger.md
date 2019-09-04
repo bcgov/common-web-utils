@@ -177,6 +177,7 @@ these are mostly providers of constants that are attached to this class. They ar
   class.validPromptTypes() { array } // => returns all valid prompt types during auth per open id connect implicit flow specs
   class.validAPIIntentions() { object } // => returns all valid intentions which are used to construct redirect uri's
   class.validHooks() { array } // => returns all valid hook types
+  class.doesHaveSearch() { boolean } // => return if uri has a search query param
 ```
 
 ### getters
