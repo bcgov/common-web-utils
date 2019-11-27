@@ -115,12 +115,14 @@ export class ImplicitAuthManager {
     };
     this.baseAuthEndpoint = this.createBaseAuthEndpointFromConfig();
     this.baseLogoutEndpoint = this.createBaseLogoutEndpointFromConfig();
+    this.redirectCountLocalStorageKey = 'iamRedirectCount';
   }
 
   // eslint-disable-next-line
   get defaultConfig() {
     return {
       loginURIResponseType: 'id_token',
+      maxRedirectTries: 2,
       hooks: {
         onBeforeAuthRedirect: () => undefined,
         onAfterAuthRedirect: () => undefined,
@@ -205,6 +207,25 @@ export class ImplicitAuthManager {
       'onAuthenticateFail',
       'onAfterAuthRedirect',
     ];
+  }
+
+  static returnOrCreateRedirectCountFromLocal() {
+    let count = getDataFromLocalStorage(this.redirectCountLocalStorageKey);
+    if (!count) {
+      count = 0;
+      saveDataInLocalStorage(this.redirectCountLocalStorageKey, count);
+    }
+
+    return count;
+  }
+
+  static deleteRedirectCountFromLocal() {
+    deleteDataFromLocalStorage(this.redirectCountLocalStorageKey);
+  }
+
+  static incrementRedirectCountFromLocal() {
+    const count = this.returnOrCreateRedirectCountFromLocal();
+    saveDataInLocalStorage(this.redirectCountLocalStorageKey, count + 1);
   }
 
   clearAuthLocalStorage() {
@@ -491,6 +512,7 @@ export class ImplicitAuthManager {
   }
 
   handleOnPageLoad() {
+    const redirectCount = ImplicitAuthManager.returnOrCreateRedirectCountFromLocal();
     if (this.isAuthenticated()) {
       // set expiry timers
       this.setTokenExpiryTimers();
@@ -499,11 +521,14 @@ export class ImplicitAuthManager {
     } else if (!this.isPageLoadFromSSORedirect()) {
       // this definition should and will change as a better method for detecting a redirect
       // is made apparent
-      this.hooks.onBeforeAuthRedirect();
-      // force redirect to get authenticated
-      const ssoLoginURI = this.getSSOLoginURIForPageLoadRedirect();
-      // eslint-disable-next-line
-      window.location.replace(ssoLoginURI);
+      if (redirectCount < this.config.maxRedirectTries) {
+        this.hooks.onBeforeAuthRedirect();
+        // force redirect to get authenticated
+        const ssoLoginURI = this.getSSOLoginURIForPageLoadRedirect();
+        // eslint-disable-next-line
+        ImplicitAuthManager.incrementRedirectCountFromLocal();
+        window.location.replace(ssoLoginURI);
+      }
     } else {
       this.hooks.onAfterAuthRedirect();
       // eslint-disable-next-line
@@ -526,6 +551,7 @@ export class ImplicitAuthManager {
       // clear nonce
       this.clearNonce();
     }
+    ImplicitAuthManager.deleteRedirectCountFromLocal();
   }
 
   // eslint-disable-next-line
