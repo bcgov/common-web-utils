@@ -1,7 +1,7 @@
 {
   "name": "@bcgov/common-web-utils",
   "version": "1.0.5",
-  "description": "",
+  "description": "A common set of web utils that can be leveraged for front end applications. ",
   "engine": "node 8.4.0",
   "main": "dist/index.js",
   "contributors": [
