@@ -581,8 +581,9 @@ export class ImplicitAuthManager {
     // eslint-disable-next-line
     const idToken = this.getIdTokenFromHash(hash);
     const error = this.getErrorFromHash(hash);
+    const redirectCount = getDataFromLocalStorage(this.redirectCountLocalStorageKey) / 1;
     // eslint-disable-next-line
-    return idToken !== null || accessToken !== null || error !== null;
+    return idToken !== null || accessToken !== null || error !== null || redirectCount > 0;
   }
 
   isAuthenticated() {
