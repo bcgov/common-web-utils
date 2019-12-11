@@ -210,7 +210,8 @@ export class ImplicitAuthManager {
 
   static returnOrCreateRedirectCountFromLocal() {
     let count = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
-    if (!count) {
+
+    if (count === undefined) {
       count = 0;
       saveDataInLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey, count);
     }
@@ -512,6 +513,7 @@ export class ImplicitAuthManager {
 
   handleOnPageLoad() {
     const redirectCount = ImplicitAuthManager.returnOrCreateRedirectCountFromLocal();
+
     if (this.isAuthenticated()) {
       // set expiry timers
       this.setTokenExpiryTimers();
@@ -550,8 +552,8 @@ export class ImplicitAuthManager {
       }
       // clear nonce
       this.clearNonce();
+      ImplicitAuthManager.deleteRedirectCountFromLocal();
     }
-    ImplicitAuthManager.deleteRedirectCountFromLocal();
   }
 
   // eslint-disable-next-line
@@ -581,10 +583,9 @@ export class ImplicitAuthManager {
     // eslint-disable-next-line
     const idToken = this.getIdTokenFromHash(hash);
     const error = this.getErrorFromHash(hash);
-    const redirectCount =
-      getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey) / 1;
+    const redirectCount = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
     // eslint-disable-next-line
-    return idToken !== null || accessToken !== null || error !== null || redirectCount > 0;
+    return idToken !== null || accessToken !== null || error !== null || (redirectCount && redirectCount > 0);
   }
 
   isAuthenticated() {
