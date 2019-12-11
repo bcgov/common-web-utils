@@ -115,7 +115,6 @@ export class ImplicitAuthManager {
     };
     this.baseAuthEndpoint = this.createBaseAuthEndpointFromConfig();
     this.baseLogoutEndpoint = this.createBaseLogoutEndpointFromConfig();
-    this.redirectCountLocalStorageKey = 'iamRedirectCount';
   }
 
   // eslint-disable-next-line
@@ -210,22 +209,22 @@ export class ImplicitAuthManager {
   }
 
   static returnOrCreateRedirectCountFromLocal() {
-    let count = getDataFromLocalStorage(this.redirectCountLocalStorageKey);
+    let count = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
     if (!count) {
       count = 0;
-      saveDataInLocalStorage(this.redirectCountLocalStorageKey, count);
+      saveDataInLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey, count);
     }
 
     return count;
   }
 
   static deleteRedirectCountFromLocal() {
-    deleteDataFromLocalStorage(this.redirectCountLocalStorageKey);
+    deleteDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
   }
 
   static incrementRedirectCountFromLocal() {
     const count = this.returnOrCreateRedirectCountFromLocal();
-    saveDataInLocalStorage(this.redirectCountLocalStorageKey, count + 1);
+    saveDataInLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey, count + 1);
   }
 
   clearAuthLocalStorage() {
@@ -527,6 +526,7 @@ export class ImplicitAuthManager {
         const ssoLoginURI = this.getSSOLoginURIForPageLoadRedirect();
         // eslint-disable-next-line
         ImplicitAuthManager.incrementRedirectCountFromLocal();
+
         window.location.replace(ssoLoginURI);
       }
     } else {
@@ -581,7 +581,8 @@ export class ImplicitAuthManager {
     // eslint-disable-next-line
     const idToken = this.getIdTokenFromHash(hash);
     const error = this.getErrorFromHash(hash);
-    const redirectCount = getDataFromLocalStorage(this.redirectCountLocalStorageKey) / 1;
+    const redirectCount =
+      getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey) / 1;
     // eslint-disable-next-line
     return idToken !== null || accessToken !== null || error !== null || redirectCount > 0;
   }
@@ -620,3 +621,5 @@ export class ImplicitAuthManager {
     });
   }
 }
+
+ImplicitAuthManager.redirectCountLocalStorageKey = 'iamRedirectCount';
