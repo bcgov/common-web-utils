@@ -141,6 +141,10 @@ export class ImplicitAuthManager {
     return this.config.redirectURI || window.location.origin;
   }
 
+  set redirectURI(uri) {
+    this.redirectURI = uri;
+  }
+
   get ssoLogoutURI() {
     return this.getSSOLogoutURI();
   }
