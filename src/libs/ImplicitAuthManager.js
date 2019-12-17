@@ -141,10 +141,6 @@ export class ImplicitAuthManager {
     return this.config.redirectURI || window.location.origin;
   }
 
-  set redirectURI(uri) {
-    this.redirectURI = uri;
-  }
-
   get ssoLogoutURI() {
     return this.getSSOLogoutURI();
   }
@@ -468,14 +464,16 @@ export class ImplicitAuthManager {
     return encodeURI(logoutURI);
   }
 
-  getSSOLoginURI(prompt = 'login') {
+  getSSOLoginURI(prompt = 'login', uri = '') {
     if (!ImplicitAuthManager.validPromptTypes().includes(prompt)) {
       throw new Error(`Prompt type must one of ${ImplicitAuthManager.validPromptTypes()}`);
     }
 
     const apiIntentions = ImplicitAuthManager.validAPIIntentions();
     const uriConf = this.config;
-    const redirectURI = this.getSSORedirectURI(apiIntentions.LOGIN);
+
+    const redirectURI = uri && isString(uri) ? uri : this.getSSORedirectURI(apiIntentions.LOGIN);
+
     const nonce = this.createNonce();
     const kcIDPHint = uriConf.kcIDPHint ? `&kc_idp_hint=${uriConf.kcIDPHint}` : '';
     const loginURI = `${this.baseAuthEndpoint}?response_type=${
