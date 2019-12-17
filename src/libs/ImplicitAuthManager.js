@@ -115,7 +115,6 @@ export class ImplicitAuthManager {
     };
     this.baseAuthEndpoint = this.createBaseAuthEndpointFromConfig();
     this.baseLogoutEndpoint = this.createBaseLogoutEndpointFromConfig();
-    this.redirectCountLocalStorageKey = 'iamRedirectCount';
   }
 
   // eslint-disable-next-line
@@ -210,22 +209,23 @@ export class ImplicitAuthManager {
   }
 
   static returnOrCreateRedirectCountFromLocal() {
-    let count = getDataFromLocalStorage(this.redirectCountLocalStorageKey);
-    if (!count) {
+    let count = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
+
+    if (count === undefined) {
       count = 0;
-      saveDataInLocalStorage(this.redirectCountLocalStorageKey, count);
+      saveDataInLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey, count);
     }
 
     return count;
   }
 
   static deleteRedirectCountFromLocal() {
-    deleteDataFromLocalStorage(this.redirectCountLocalStorageKey);
+    deleteDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
   }
 
   static incrementRedirectCountFromLocal() {
     const count = this.returnOrCreateRedirectCountFromLocal();
-    saveDataInLocalStorage(this.redirectCountLocalStorageKey, count + 1);
+    saveDataInLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey, count + 1);
   }
 
   clearAuthLocalStorage() {
@@ -464,14 +464,16 @@ export class ImplicitAuthManager {
     return encodeURI(logoutURI);
   }
 
-  getSSOLoginURI(prompt = 'login') {
+  getSSOLoginURI(prompt = 'login', uri = '') {
     if (!ImplicitAuthManager.validPromptTypes().includes(prompt)) {
       throw new Error(`Prompt type must one of ${ImplicitAuthManager.validPromptTypes()}`);
     }
 
     const apiIntentions = ImplicitAuthManager.validAPIIntentions();
     const uriConf = this.config;
-    const redirectURI = this.getSSORedirectURI(apiIntentions.LOGIN);
+
+    const redirectURI = uri && isString(uri) ? uri : this.getSSORedirectURI(apiIntentions.LOGIN);
+
     const nonce = this.createNonce();
     const kcIDPHint = uriConf.kcIDPHint ? `&kc_idp_hint=${uriConf.kcIDPHint}` : '';
     const loginURI = `${this.baseAuthEndpoint}?response_type=${
@@ -513,6 +515,7 @@ export class ImplicitAuthManager {
 
   handleOnPageLoad() {
     const redirectCount = ImplicitAuthManager.returnOrCreateRedirectCountFromLocal();
+
     if (this.isAuthenticated()) {
       // set expiry timers
       this.setTokenExpiryTimers();
@@ -527,6 +530,7 @@ export class ImplicitAuthManager {
         const ssoLoginURI = this.getSSOLoginURIForPageLoadRedirect();
         // eslint-disable-next-line
         ImplicitAuthManager.incrementRedirectCountFromLocal();
+
         window.location.replace(ssoLoginURI);
       }
     } else {
@@ -550,8 +554,8 @@ export class ImplicitAuthManager {
       }
       // clear nonce
       this.clearNonce();
+      ImplicitAuthManager.deleteRedirectCountFromLocal();
     }
-    ImplicitAuthManager.deleteRedirectCountFromLocal();
   }
 
   // eslint-disable-next-line
@@ -581,8 +585,9 @@ export class ImplicitAuthManager {
     // eslint-disable-next-line
     const idToken = this.getIdTokenFromHash(hash);
     const error = this.getErrorFromHash(hash);
+    const redirectCount = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
     // eslint-disable-next-line
-    return idToken !== null || accessToken !== null || error !== null;
+    return idToken !== null || accessToken !== null || error !== null || (redirectCount && redirectCount > 0);
   }
 
   isAuthenticated() {
@@ -619,3 +624,5 @@ export class ImplicitAuthManager {
     });
   }
 }
+
+ImplicitAuthManager.redirectCountLocalStorageKey = 'iamRedirectCount';

@@ -274,6 +274,24 @@ describe('Implicit Auth Manager Class', () => {
     });
   });
 
+  describe('Redirect Count State', () => {
+    test('redirect counts can be incremented and deleted', () => {
+      ImplicitAuthManager.incrementRedirectCountFromLocal();
+      const count = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
+      expect(count).toBe(1);
+
+      ImplicitAuthManager.incrementRedirectCountFromLocal();
+      const count2 = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
+      expect(count2).toBe(2);
+
+      ImplicitAuthManager.deleteRedirectCountFromLocal();
+      const count3 = getDataFromLocalStorage(ImplicitAuthManager.redirectCountLocalStorageKey);
+      expect(count3).not.toBeDefined();
+
+    })
+  })
+
+
   describe('Nonce/Request Key generation/management', () => {
     // test('creating request keys are relatively unique', () => {
     //   const config = {
